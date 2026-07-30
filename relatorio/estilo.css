@@ -1,0 +1,400 @@
+:root {
+  --ink: #202124;
+  --muted: #62666b;
+  --rule: #c9cccf;
+  --accent: #e65b2c;
+  --accent-dark: #b8421d;
+  --code-bg: #f5f5f3;
+  --paper: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: #050505;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #050505;
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 17px;
+  line-height: 1.64;
+  margin: 0;
+}
+
+.report-page {
+  background: var(--paper);
+  margin: 0 auto;
+  max-width: 78rem;
+  min-height: 100vh;
+  padding: 4rem 5rem 6rem;
+}
+
+.report-header,
+.report-toc {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 68rem;
+}
+
+.report-header {
+  border-bottom: 3px solid var(--accent);
+  padding-bottom: 1.45rem;
+}
+
+h1.title {
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: clamp(2.4rem, 5.2vw, 3.55rem);
+  font-weight: 750;
+  letter-spacing: -0.045em;
+  line-height: 1.03;
+  margin: 0 0 1.6rem;
+  max-width: 64rem;
+  text-align: left;
+}
+
+.report-meta {
+  color: var(--muted);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.92rem;
+  line-height: 1.48;
+}
+
+.report-meta p {
+  margin: 0.12rem 0;
+  text-align: left;
+}
+
+.report-meta .author {
+  color: var(--ink);
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.report-meta .keywords {
+  margin-top: 0.65rem;
+}
+
+a {
+  color: var(--accent-dark);
+  text-decoration-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  text-underline-offset: 0.14em;
+}
+
+a:hover,
+a:focus-visible {
+  color: var(--accent);
+}
+
+.report-toc {
+  border-bottom: 1px solid var(--rule);
+  margin-top: 1.5rem;
+  padding: 0 0 1.35rem;
+}
+
+.report-toc summary {
+  color: var(--ink);
+  cursor: pointer;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  list-style-position: inside;
+  text-transform: uppercase;
+}
+
+.report-toc summary::marker {
+  color: var(--accent);
+}
+
+#TOC > ul {
+  column-count: 2;
+  column-gap: 3rem;
+  margin: 1rem 0 0;
+  padding-left: 1.15rem;
+}
+
+#TOC ul {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.83rem;
+  line-height: 1.45;
+}
+
+#TOC li {
+  break-inside: avoid;
+  margin: 0.28rem 0;
+}
+
+#TOC ul ul {
+  margin: 0.25rem 0 0.55rem;
+  padding-left: 1.1rem;
+}
+
+#TOC a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+#TOC a:hover,
+#TOC a:focus-visible {
+  color: var(--accent-dark);
+}
+
+.report-content {
+  margin: 3.4rem auto 0;
+  max-width: 46rem;
+}
+
+.report-content h1,
+.report-content h2,
+.report-content h3,
+.report-content h4 {
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.018em;
+  line-height: 1.2;
+  scroll-margin-top: 1rem;
+}
+
+.report-content h1 {
+  border-top: 1px solid var(--rule);
+  font-size: 1.8rem;
+  margin: 4rem 0 1.35rem;
+  padding-top: 1.15rem;
+}
+
+.report-content h1:first-child {
+  border-top: 0;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.report-content h2 {
+  font-size: 1.35rem;
+  margin: 2.8rem 0 1rem;
+}
+
+.report-content h3 {
+  font-size: 1.08rem;
+  margin: 2.15rem 0 0.8rem;
+}
+
+.report-content h4 {
+  font-size: 0.98rem;
+  margin: 1.8rem 0 0.65rem;
+}
+
+.report-content p {
+  hyphens: auto;
+  margin: 0 0 1rem;
+  text-align: justify;
+}
+
+.figure-title,
+.table-title {
+  color: var(--muted);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 2rem auto 0.75rem;
+  text-align: center;
+}
+
+.figure-source,
+.figure-source p,
+.figure-container,
+.figure-container p {
+  color: var(--muted);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+.figure-source {
+  margin: 0.2rem 0 1.4rem;
+}
+
+img {
+  display: block;
+  height: auto;
+  margin: 0 auto;
+  max-width: 100%;
+}
+
+.math.display,
+math[display="block"] {
+  margin: 1.25rem auto;
+  overflow-x: auto;
+  text-align: center;
+}
+
+div.sourceCode {
+  margin: 1.3rem 0 1.65rem;
+}
+
+pre {
+  background: var(--code-bg);
+  border: 0;
+  border-bottom: 1px solid var(--rule);
+  border-radius: 0;
+  border-top: 1px solid var(--rule);
+  font-size: 0.76rem;
+  line-height: 1.48;
+  margin: 0;
+  max-height: 42rem;
+  overflow: auto;
+  padding: 1rem 1.1rem;
+}
+
+code {
+  font-family: Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+:not(pre) > code {
+  background: var(--code-bg);
+  border-radius: 2px;
+  font-size: 0.86em;
+  padding: 0.08em 0.25em;
+}
+
+.table-title + .sourceCode,
+.table-title + div {
+  margin-top: 0.5rem;
+}
+
+table {
+  border-collapse: collapse;
+  display: table;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  margin: 1rem auto 2rem;
+  width: 100%;
+}
+
+thead {
+  border-bottom: 2px solid var(--ink);
+  border-top: 1px solid var(--ink);
+}
+
+tbody tr {
+  border-bottom: 1px solid var(--rule);
+}
+
+th,
+td {
+  background: transparent;
+  border: 0;
+  padding: 0.52rem 0.48rem;
+}
+
+th {
+  font-weight: 700;
+  text-align: center;
+}
+
+td {
+  text-align: right;
+}
+
+td:first-child,
+td:nth-child(2) {
+  text-align: left;
+}
+
+.references,
+.references p {
+  text-align: left;
+}
+
+.references p {
+  font-size: 0.93rem;
+  margin-bottom: 0.85rem;
+}
+
+.references p[id^="ref-"] {
+  scroll-margin-top: 1rem;
+}
+
+.report-content h1:target,
+.report-content h2:target,
+.report-content h3:target,
+.references p:target {
+  background: #fff3eb;
+  border-radius: 0.15rem;
+  box-shadow: 0 0 0 0.42rem #fff3eb;
+}
+
+@media (max-width: 960px) {
+  .report-page {
+    padding: 3rem 2.1rem 5rem;
+  }
+
+  #TOC > ul {
+    column-count: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  body {
+    font-size: 16px;
+  }
+
+  .report-page {
+    padding: 2rem 0.9rem 4rem;
+  }
+
+  h1.title {
+    font-size: 2.15rem;
+  }
+
+  .report-content {
+    margin-top: 2.5rem;
+  }
+
+  .report-content h1 {
+    font-size: 1.55rem;
+  }
+
+  pre {
+    font-size: 0.7rem;
+    white-space: pre-wrap;
+  }
+
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+
+@media print {
+  html,
+  body {
+    background: #fff;
+  }
+
+  .report-page {
+    max-width: none;
+    padding: 0;
+  }
+
+  .report-toc {
+    break-after: page;
+  }
+
+  .report-content h1:target,
+  .report-content h2:target,
+  .report-content h3:target,
+  .references p:target {
+    background: transparent;
+    box-shadow: none;
+  }
+}

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html$if(lang)$ lang="$lang$" xml:lang="$lang$"$endif$>
+<head>
+<meta charset="utf-8">
+<meta name="generator" content="pandoc">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+$for(author-meta)$
+<meta name="author" content="$author-meta$">
+$endfor$
+<title>$if(title-prefix)$$title-prefix$ – $endif$$pagetitle$</title>
+$for(header-includes)$
+$header-includes$
+$endfor$
+<style>
+code { white-space: pre-wrap; }
+span.smallcaps { font-variant: small-caps; }
+div.hanging-indent { margin-left: 1.5em; text-indent: -1.5em; }
+ul.task-list { list-style: none; }
+.display.math { display: block; margin: 0.8rem auto; text-align: center; }
+</style>
+$if(highlighting-css)$
+<style data-origin="pandoc">
+$highlighting-css$
+</style>
+$endif$
+$for(css)$
+<link rel="stylesheet" href="$css$">
+$endfor$
+</head>
+<body>
+<main class="report-page">
+<header class="report-header">
+$if(title)$
+<h1 class="title">$title$</h1>
+$endif$
+<div class="report-meta">
+$for(author)$
+<p class="author"><strong>$author$</strong></p>
+$endfor$
+$if(affiliation)$
+<p>$affiliation$</p>
+$endif$
+$if(secondary-affiliation)$
+<p>$secondary-affiliation$</p>
+$endif$
+$if(email)$
+<p class="email">$email$</p>
+$endif$
+$if(keywords)$
+<p class="keywords"><strong>Palavras-chave:</strong> $keywords$</p>
+$endif$
+</div>
+</header>
+$if(toc)$
+<details class="report-toc" open>
+<summary>Sumário</summary>
+<nav id="TOC" role="doc-toc">
+$toc$
+</nav>
+</details>
+$endif$
+<article class="report-content">
+$for(include-before)$
+$include-before$
+$endfor$
+$body$
+$for(include-after)$
+$include-after$
+$endfor$
+</article>
+</main>
+</body>
+</html>

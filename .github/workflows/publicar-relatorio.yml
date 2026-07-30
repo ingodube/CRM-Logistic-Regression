@@ -1,0 +1,73 @@
+name: Publicar relatório técnico
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "relatorio/**"
+      - "scripts/preparar_dados_relatorio.R"
+      - "scripts/renderizar_relatorio.R"
+      - "scripts/validar_relatorio.R"
+      - "Resultados/**"
+      - "renv.lock"
+      - ".github/workflows/publicar-relatorio.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  renderizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: "4.6.1"
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - name: Instalar dependências de sistema
+        run: sudo apt-get update && sudo apt-get install -y jags poppler-utils
+
+      - uses: r-lib/actions/setup-renv@v2
+
+      - name: Preparar dados derivados do relatório
+        run: Rscript scripts/preparar_dados_relatorio.R
+
+      - name: Atualizar gráfico e planilha dos traços
+        run: Rscript "Resultados/TRI/Regressão Estrutural/Regressão Logística/CRM - Normal (Wang e Zeng)/Analise_Classic_vs_Joint/grafico_thetas_crm.R"
+
+      - name: Renderizar relatório
+        run: Rscript scripts/renderizar_relatorio.R
+
+      - name: Validar relatório
+        run: Rscript scripts/validar_relatorio.R
+
+      - name: Comparar seções preservadas com o PDF
+        run: Rscript scripts/comparar_texto_relatorio.R
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: docs
+
+  implantar:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: renderizar
+    steps:
+      - name: Implantar no GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,66 @@
+n,p,method,param,file,rows,cols,expected_rows,expected_cols,status,note
+100,10,Classic,a,a_estimados_EM.txt,10,1000,10,1000,ok,
+100,10,Classic,b,b_estimados_EM.txt,10,1000,10,1000,ok,
+100,10,Classic,alpha,alpha_estimados_EM.txt,10,1000,10,1000,ok,
+100,10,Classic,theta,theta_estimados_EM.txt,10,1000,100,1000,invalid,Dimensao ou valores invalidos; metrica marcada como NA.
+100,20,Classic,a,a_estimados_EM.txt,,,20,1000,missing,Arquivo ausente.
+100,20,Classic,b,b_estimados_EM.txt,,,20,1000,missing,Arquivo ausente.
+100,20,Classic,alpha,alpha_estimados_EM.txt,,,20,1000,missing,Arquivo ausente.
+100,20,Classic,theta,theta_estimados_EM.txt,,,100,1000,missing,Arquivo ausente.
+1000,10,Classic,a,a_estimados_EM.txt,10,1000,10,1000,ok,
+1000,10,Classic,b,b_estimados_EM.txt,10,1000,10,1000,ok,
+1000,10,Classic,alpha,alpha_estimados_EM.txt,10,1000,10,1000,ok,
+1000,10,Classic,theta,theta_estimados_EM.txt,10,1000,1000,1000,invalid,Dimensao ou valores invalidos; metrica marcada como NA.
+1000,20,Classic,a,a_estimados_EM.txt,,,20,1000,missing,Arquivo ausente.
+1000,20,Classic,b,b_estimados_EM.txt,,,20,1000,missing,Arquivo ausente.
+1000,20,Classic,alpha,alpha_estimados_EM.txt,,,20,1000,missing,Arquivo ausente.
+1000,20,Classic,theta,theta_estimados_EM.txt,,,1000,1000,missing,Arquivo ausente.
+250,10,Classic,a,a_estimados_EM.txt,10,1000,10,1000,ok,
+250,10,Classic,b,b_estimados_EM.txt,10,1000,10,1000,ok,
+250,10,Classic,alpha,alpha_estimados_EM.txt,10,1000,10,1000,ok,
+250,10,Classic,theta,theta_estimados_EM.txt,250,1000,250,1000,ok,
+250,20,Classic,a,a_estimados_EM.txt,,,20,1000,missing,Arquivo ausente.
+250,20,Classic,b,b_estimados_EM.txt,,,20,1000,missing,Arquivo ausente.
+250,20,Classic,alpha,alpha_estimados_EM.txt,,,20,1000,missing,Arquivo ausente.
+250,20,Classic,theta,theta_estimados_EM.txt,,,250,1000,missing,Arquivo ausente.
+500,10,Classic,a,a_estimados_EM.txt,10,1000,10,1000,ok,
+500,10,Classic,b,b_estimados_EM.txt,10,1000,10,1000,ok,
+500,10,Classic,alpha,alpha_estimados_EM.txt,10,1000,10,1000,ok,
+500,10,Classic,theta,theta_estimados_EM.txt,10,1000,500,1000,invalid,Dimensao ou valores invalidos; metrica marcada como NA.
+500,20,Classic,a,a_estimados_EM.txt,,,20,1000,missing,Arquivo ausente.
+500,20,Classic,b,b_estimados_EM.txt,,,20,1000,missing,Arquivo ausente.
+500,20,Classic,alpha,alpha_estimados_EM.txt,,,20,1000,missing,Arquivo ausente.
+500,20,Classic,theta,theta_estimados_EM.txt,,,500,1000,missing,Arquivo ausente.
+100,10,Joint,a,a_estimados_mean.txt,10,1000,10,1000,ok,
+100,10,Joint,b,b_estimados_mean.txt,10,1000,10,1000,ok,
+100,10,Joint,alpha,alpha_estimados_mean.txt,10,1000,10,1000,ok,
+100,10,Joint,theta,thetas_estimados_mean.txt,100,1000,100,1000,ok,
+100,20,Joint,a,a_estimados_mean.txt,,,20,1000,missing,Arquivo ausente.
+100,20,Joint,b,b_estimados_mean.txt,,,20,1000,missing,Arquivo ausente.
+100,20,Joint,alpha,alpha_estimados_mean.txt,,,20,1000,missing,Arquivo ausente.
+100,20,Joint,theta,thetas_estimados_mean.txt,,,100,1000,missing,Arquivo ausente.
+1000,10,Joint,a,a_estimados_mean.txt,10,1000,10,1000,ok,
+1000,10,Joint,b,b_estimados_mean.txt,10,1000,10,1000,ok,
+1000,10,Joint,alpha,alpha_estimados_mean.txt,10,1000,10,1000,ok,
+1000,10,Joint,theta,thetas_estimados_mean.txt,1000,1000,1000,1000,ok,
+1000,20,Joint,a,a_estimados_mean.txt,,,20,1000,missing,Arquivo ausente.
+1000,20,Joint,b,b_estimados_mean.txt,,,20,1000,missing,Arquivo ausente.
+1000,20,Joint,alpha,alpha_estimados_mean.txt,,,20,1000,missing,Arquivo ausente.
+1000,20,Joint,theta,thetas_estimados_mean.txt,,,1000,1000,missing,Arquivo ausente.
+250,10,Joint,a,a_estimados_mean.txt,10,1000,10,1000,ok,
+250,10,Joint,b,b_estimados_mean.txt,10,1000,10,1000,ok,
+250,10,Joint,alpha,alpha_estimados_mean.txt,10,1000,10,1000,ok,
+250,10,Joint,theta,thetas_estimados_mean.txt,250,1000,250,1000,ok,
+250,20,Joint,a,a_estimados_mean.txt,20,1000,20,1000,ok,
+250,20,Joint,b,b_estimados_mean.txt,20,1000,20,1000,ok,
+250,20,Joint,alpha,alpha_estimados_mean.txt,20,1000,20,1000,ok,
+250,20,Joint,theta,thetas_estimados_mean.txt,250,1000,250,1000,ok,
+500,10,Joint,a,a_estimados_mean.txt,10,1000,10,1000,ok,
+500,10,Joint,b,b_estimados_mean.txt,10,1000,10,1000,ok,
+500,10,Joint,alpha,alpha_estimados_mean.txt,10,1000,10,1000,ok,
+500,10,Joint,theta,thetas_estimados_mean.txt,500,1000,500,1000,ok,
+500,20,Joint,a,a_estimados_mean.txt,,,20,1000,missing,Arquivo ausente.
+500,20,Joint,b,b_estimados_mean.txt,,,20,1000,missing,Arquivo ausente.
+500,20,Joint,alpha,alpha_estimados_mean.txt,,,20,1000,missing,Arquivo ausente.
+500,20,Joint,theta,thetas_estimados_mean.txt,,,500,1000,missing,Arquivo ausente.
+,,Classic,theta,TRI Classic Reg. Log. *.R,,,,,warning,Os scripts Classic inspecionados gravam alpha_estimados_EM em theta_estimados_EM.txt; por isso cenarios com theta fora de n x 1000 ficam como NA.
