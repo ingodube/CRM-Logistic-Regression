@@ -8,7 +8,8 @@ if (!file.exists(html_path)) {
 }
 
 html <- paste(readLines(html_path, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
-rmd <- paste(readLines(rmd_path, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
+rmd_lines <- readLines(rmd_path, warn = FALSE, encoding = "UTF-8")
+rmd <- paste(rmd_lines, collapse = "\n")
 plain <- gsub("<script[^>]*>.*?</script>", " ", html, perl = TRUE)
 plain <- gsub("<style[^>]*>.*?</style>", " ", plain, perl = TRUE)
 plain <- gsub("<[^>]+>", " ", plain, perl = TRUE)
@@ -210,6 +211,21 @@ missing_chunks <- required_chunks[!vapply(
 )]
 if (length(missing_chunks) > 0) {
   stop("Blocos obrigatórios ausentes: ", paste(missing_chunks, collapse = "; "))
+}
+
+curve_chunks <- c(
+  "curvas-crm-funcoes", "figura-2-discriminacao",
+  "figura-3-dificuldade", "figura-4-escala",
+  "figura-5-discriminacao-escala"
+)
+for (chunk in curve_chunks) {
+  start <- grep(paste0("^```\\{r ", chunk, "(?:,|\\})"),
+                rmd_lines, perl = TRUE)
+  finish <- which(seq_along(rmd_lines) > start & rmd_lines == "```")[[1]]
+  chunk_code <- rmd_lines[seq.int(start + 1L, finish - 1L)]
+  if (any(grepl("^[[:space:]]*#", chunk_code))) {
+    stop("O bloco de construção da curva contém comentários: ", chunk)
+  }
 }
 
 if (!grepl("eval = FALSE", rmd, fixed = TRUE)) {

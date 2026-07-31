@@ -132,42 +132,21 @@ $$
 Assim, itens com maior discriminação fornecem mais informação e reduzem o erro-padrão associado à estimação do traço. A [Figura 2](#fig-crm-discriminacao) ilustra esse comportamento mantendo $b_j$ e $\alpha_j$ fixos.
 
 ```{r curvas-crm-funcoes, eval=TRUE}
-# Pacotes --------------------------------------------------------------------
 library(ggplot2)
 library(dplyr)
 library(patchwork)
-
-# Modelo TRI contínua - CRM --------------------------------------------------
-# No artigo, o parâmetro de escala é denotado por alpha.
-#
-# P(Y >= lambda | theta) = Phi[v]
-#
-# v = a * (theta - b - (1/alpha) * log(lambda/(k - lambda)))
-#
-# em que:
-# a      = discriminação do item
-# b      = dificuldade do item
-# alpha  = parâmetro de escala do item
-# k      = limite superior da escala contínua de resposta
-# lambda = ponto de corte da escala de resposta, com 0 < lambda < k
 
 crm_p_ge_lambda = function(theta, lambda, a, b, alpha, k){
   v = a * (theta - b - (1 / alpha) * log(lambda / (k - lambda)))
   pnorm(v)
 }
 
-# Sequência de habilidade ----------------------------------------------------
 theta = seq(-8, 8, length.out = 500)
 
-# Limite superior da escala contínua de resposta
-# Exemplo: respostas variando de 0 a 5
 k = 5
 
-# Pontos de corte usados para desenhar as curvas cumulativas
-# Como 0 < lambda < k, usamos lambda = 1, 2, 3, 4
 lambda_values = 1:4
 
-# Função para montar base de dados do CRM ------------------------------------
 montar_dados_crm = function(theta, a_values, b_values, alpha_values,
                             k = 5, lambda_values = 1:4){
 
@@ -206,7 +185,6 @@ montar_dados_crm = function(theta, a_values, b_values, alpha_values,
   return(dados_curvas)
 }
 
-# Função para plotar cada item ------------------------------------------------
 plot_item_crm = function(i, dados_curvas){
 
   df_prob = dados_curvas %>%
@@ -244,7 +222,6 @@ plot_item_crm = function(i, dados_curvas){
     theme_classic()
 }
 
-# Função para montar painel de itens -----------------------------------------
 plot_cenario_crm = function(nome_cenario, a_values, b_values, alpha_values,
                             theta = theta, k = 5, lambda_values = 1:4){
 
@@ -288,13 +265,6 @@ plot_cenario_crm = function(nome_cenario, a_values, b_values, alpha_values,
 <div id="fig-crm-discriminacao" class="figure-title">Figura 2: Curvas características acumuladas do CRM para diferentes valores do parâmetro de discriminação $a_j$, mantendo $b_j=0$ e $\alpha_j=1$.</div>
 
 ```{r figura-2-discriminacao, eval=TRUE, fig.width=9.5, fig.height=7.2}
-# =============================================================================
-# 1) Exemplo variando as discriminações: parâmetro a
-# =============================================================================
-# Interpretação esperada:
-# - Quanto maior a, mais íngremes são as curvas P(Y >= lambda | theta).
-# - b e alpha são mantidos fixos.
-
 a_values = c(0.5, 1.0, 1.8, 3.0)
 b_values = c(0, 0, 0, 0)
 alpha_values = c(1, 1, 1, 1)
@@ -314,20 +284,13 @@ print(cenario_a$painel_itens)
 
 <div class="figure-source">Fonte: elaboração própria do autor.</div>
 
+Na [Figura 2](#fig-crm-discriminacao), o aumento de $a_j$ torna as curvas progressivamente mais íngremes. O item 1, com $a_j=0{,}5$, apresenta transições graduais ao longo de uma faixa ampla de $\theta$, enquanto o item 4, com $a_j=3$, concentra a mudança de probabilidade em uma faixa estreita. Portanto, maiores valores de $a_j$ aumentam a capacidade do item de distinguir indivíduos com níveis próximos do traço latente e, consequentemente, elevam sua informação.
+
 O parâmetro $b_j$ determina a localização horizontal das curvas e representa o nível do traço latente exigido para que o indivíduo alcance uma mesma probabilidade acumulada. Conforme mostra a [Figura 3](#fig-crm-dificuldade), valores maiores deslocam todas as curvas do item para a direita, enquanto valores menores as deslocam para a esquerda. Como $b_j$ altera a localização, mas não a inclinação das curvas, ele não modifica $I_j(\theta)=a_j^2$.
 
 <div id="fig-crm-dificuldade" class="figure-title">Figura 3: Curvas características acumuladas do CRM para diferentes valores do parâmetro de dificuldade $b_j$, mantendo $a_j=1{,}5$ e $\alpha_j=1$.</div>
 
 ```{r figura-3-dificuldade, eval=TRUE, fig.width=9.5, fig.height=7.2}
-# =============================================================================
-# 2) Exemplo variando as dificuldades: parâmetro b
-# =============================================================================
-# Interpretação esperada:
-# - Quanto maior b, mais à direita ficam as curvas.
-# - Itens com maior b exigem maior theta para atingir a mesma probabilidade
-#   acumulada P(Y >= lambda | theta).
-# - a e alpha são mantidos fixos.
-
 a_values = c(1.5, 1.5, 1.5, 1.5)
 b_values = c(-2.0, -0.5, 1.0, 2.5)
 alpha_values = c(1, 1, 1, 1)
@@ -347,22 +310,13 @@ print(cenario_b$painel_itens)
 
 <div class="figure-source">Fonte: elaboração própria do autor.</div>
 
+Na [Figura 3](#fig-crm-dificuldade), as curvas mantêm a mesma inclinação e o mesmo espaçamento, mas se deslocam horizontalmente à medida que $b_j$ aumenta. O item 1, com $b_j=-2$, requer níveis menores de $\theta$ para atingir determinada probabilidade acumulada; o item 4, com $b_j=2{,}5$, requer níveis maiores. Assim, $b_j$ indica a localização ou dificuldade do item na escala latente, sem alterar sua discriminação ou informação.
+
 O parâmetro $\alpha_j$ controla a escala da transformação entre a resposta observada e o traço latente. Na distribuição da Equação (3), a variância condicional é $\alpha_j^2/a_j^2$; nas curvas acumuladas, $\alpha_j$ também regula a distância horizontal entre os pontos de corte. Valores menores ampliam o espaçamento entre as curvas associadas aos diferentes valores de $\lambda$, enquanto valores maiores aproximam essas curvas. A [Figura 4](#fig-crm-escala) evidencia que esse parâmetro afeta a forma como a escala contínua de respostas é discretizada em níveis acumulados.
 
 <div id="fig-crm-escala" class="figure-title">Figura 4: Curvas características acumuladas do CRM para diferentes valores do parâmetro de escala $\alpha_j$, mantendo $a_j=1{,}5$ e $b_j=0$.</div>
 
 ```{r figura-4-escala, eval=TRUE, fig.width=9.5, fig.height=7.2}
-# =============================================================================
-# 3) Exemplo variando as escalas: parâmetro alpha
-# =============================================================================
-# Interpretação esperada:
-# - O parâmetro alpha controla a transformação entre a escala original de
-#   resposta Y e a escala latente theta.
-# - Valores menores de alpha aumentam a distância horizontal entre as curvas
-#   P(Y >= lambda | theta) associadas aos diferentes pontos de corte lambda.
-# - Valores maiores de alpha aproximam essas curvas.
-# - a e b são mantidos fixos.
-
 a_values = c(1.5, 1.5, 1.5, 1.5)
 b_values = c(0, 0, 0, 0)
 alpha_values = c(0.5, 0.8, 1.5, 3.0)
@@ -382,16 +336,13 @@ print(cenario_alpha$painel_itens)
 
 <div class="figure-source">Fonte: elaboração própria do autor.</div>
 
+Na [Figura 4](#fig-crm-escala), valores menores de $\alpha_j$ produzem maior separação horizontal entre as curvas correspondentes aos pontos de corte $\lambda$, como ocorre no item 1, com $\alpha_j=0{,}5$. Conforme $\alpha_j$ aumenta, as curvas se aproximam e as transições entre níveis de resposta passam a ocorrer em uma região mais concentrada de $\theta$, comportamento mais evidente no item 4, com $\alpha_j=3$. Desse modo, $\alpha_j$ controla o espaçamento entre os limiares na escala do traço latente.
+
 Os parâmetros $a_j$ e $\alpha_j$ atuam conjuntamente no formato das curvas. O primeiro controla principalmente a inclinação e a informação do item, enquanto o segundo controla o espaçamento entre os limiares transformados. Assim, itens com a mesma localização podem apresentar combinações muito distintas de precisão e separação entre níveis de resposta. A [Figura 5](#fig-crm-discriminacao-escala) reúne quatro combinações e permite observar essa interação.
 
 <div id="fig-crm-discriminacao-escala" class="figure-title">Figura 5: Curvas características acumuladas do CRM para diferentes combinações dos parâmetros de discriminação $a_j$ e escala $\alpha_j$, mantendo $b_j=0$.</div>
 
 ```{r figura-5-discriminacao-escala, eval=TRUE, fig.width=9.5, fig.height=7.2}
-# =============================================================================
-# 4) Exemplo adicional: parâmetros semelhantes aos itens hipotéticos do artigo
-# =============================================================================
-# O artigo ilustra itens com diferentes valores de a, b e alpha.
-
 a_values = c(1.0, 0.2, 0.2, 2.5)
 b_values = c(0.0, 0.0, 0.0, 0.0)
 alpha_values = c(1.0, 0.2, 2.5, 0.2)
@@ -410,6 +361,8 @@ print(cenario_artigo$painel_itens)
 ```
 
 <div class="figure-source">Fonte: elaboração própria do autor.</div>
+
+Na [Figura 5](#fig-crm-discriminacao-escala), a combinação de $a_j$ e $\alpha_j$ determina simultaneamente a inclinação e a separação das curvas. O item 2 combina baixa discriminação e baixo parâmetro de escala, resultando em curvas planas e muito espaçadas; o item 3 mantém a baixa discriminação, mas o maior $\alpha_j$ aproxima os limiares. Já o item 4 associa alta discriminação a baixo $\alpha_j$, produzindo curvas muito íngremes, porém separadas. Esses padrões mostram que os parâmetros exercem funções distintas e complementares na caracterização do item.
 
 ## Regressão Logística {#regressao-logistica}
 
