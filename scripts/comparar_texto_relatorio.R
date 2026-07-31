@@ -30,6 +30,8 @@ pdf_text <- gsub("\n", " ", pdf_text)
 normalizar <- function(x) {
   x <- stringi::stri_trans_nfc(x)
   x <- gsub("\\[([^]]+)\\]\\(#[^)]+\\)", "\\1", x)
+  x <- gsub("Figura 6", "Figura 2", x, fixed = TRUE)
+  x <- gsub("Figura 7", "Figura 3", x, fixed = TRUE)
   x <- gsub("β", " beta ", x, fixed = TRUE)
   x <- gsub("θ", " theta ", x, fixed = TRUE)
   x <- gsub("α", " alpha ", x, fixed = TRUE)
@@ -65,6 +67,8 @@ indices <- c(
   intervalo("^# Introdução \\{#introducao\\}$",
             "^# Metodologia \\{#metodologia\\}$"),
   intervalo("^# Metodologia \\{#metodologia\\}$",
+            "^### Interpretação dos parâmetros \\{#interpretacao-parametros\\}$"),
+  intervalo("^## Regressão Logística \\{#regressao-logistica\\}$",
             "^## Métodos de Estimação \\{#metodos-estimacao\\}$"),
   intervalo("^# Resultados Numéricos \\{#resultados-numericos\\}$",
             "^# Conclusão e Trabalhos Futuros \\{#conclusao-trabalhos-futuros\\}$"),

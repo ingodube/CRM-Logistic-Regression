@@ -79,8 +79,8 @@ if (any(vapply(result_r_files, function(path) {
 
 required_packages <- c(
   "bayesplot", "coda", "doParallel", "dplyr", "EstCRM", "foreach",
-  "ggplot2", "loo", "Metrics", "mcmcplots", "openxlsx", "psych",
-  "purrr", "R2jags", "rjags", "simcausal", "tidyr", "truncnorm"
+  "ggplot2", "loo", "Metrics", "mcmcplots", "openxlsx", "patchwork",
+  "psych", "purrr", "R2jags", "rjags", "simcausal", "tidyr", "truncnorm"
 )
 missing_packages <- required_packages[!vapply(required_packages, requireNamespace, logical(1), quietly = TRUE)]
 

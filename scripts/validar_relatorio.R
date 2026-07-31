@@ -34,6 +34,7 @@ required_phrases <- c(
   "Palavras-chave",
   "Introdução",
   "Teoria da Resposta ao Item para Respostas Contínuas",
+  "Interpretação dos parâmetros",
   "Estimação em Duas Etapas",
   "Estimação Simultânea",
   "Estudo com Dados Simulados",
@@ -52,7 +53,7 @@ if (grepl(">Resumo<", html, fixed = TRUE) || grepl("id=\"resumo\"", html, fixed 
   stop("Uma seção de resumo foi encontrada, mas deve ser omitida.")
 }
 
-for (figure in c("Figura 1:", "Figura 2:", "Figura 3:", "Tabela 1:")) {
+for (figure in c(paste0("Figura ", 1:7, ":"), "Tabela 1:")) {
   if (!grepl(figure, plain, fixed = TRUE)) stop("Elemento obrigatório ausente: ", figure)
 }
 
@@ -79,9 +80,9 @@ if (!grepl("<math", html, fixed = TRUE)) {
 }
 
 expected_source <- "Fonte: elaboração própria do autor."
-if (count_matches(expected_source, rmd, fixed = TRUE) != 4L ||
-    count_matches(expected_source, plain, fixed = TRUE) != 4L) {
-  stop("As quatro figuras e tabelas devem apresentar a fonte do autor.")
+if (count_matches(expected_source, rmd, fixed = TRUE) != 8L ||
+    count_matches(expected_source, plain, fixed = TRUE) != 8L) {
+  stop("As sete figuras e a tabela devem apresentar a fonte do autor.")
 }
 
 if (grepl("Nota de auditoria", rmd, fixed = TRUE) ||
@@ -121,21 +122,40 @@ if (grepl("declaracao-uso-ia", toc_html, fixed = TRUE)) {
   stop("A declaração de uso de IA não deve aparecer no sumário.")
 }
 
-html_ids <- sub('^id="|"$', '', extract_matches('id="[^"]+"', html))
+html_ids <- sub('^id="([^"]+)"$', '\\1',
+                extract_matches('id="[^"]+"', html))
 duplicated_ids <- unique(html_ids[duplicated(html_ids)])
 if (length(duplicated_ids) > 0L) {
   stop("IDs duplicados no HTML: ", paste(duplicated_ids, collapse = ", "))
 }
 
-fragment_links <- sub('^href="#|"$', '', extract_matches('href="#[^"]+"', html))
+fragment_links <- sub('^href="#([^"]+)"$', '\\1',
+                      extract_matches('href="#[^"]+"', html))
 missing_targets <- setdiff(fragment_links, html_ids)
 if (length(missing_targets) > 0L) {
   stop("Links internos sem destino: ", paste(missing_targets, collapse = ", "))
 }
 
-toc_targets <- sub('^href="#|"$', '', extract_matches('href="#[^"]+"', toc_html))
-if (length(toc_targets) != 16L || anyDuplicated(toc_targets)) {
-  stop("O sumário deve conter 16 destinos internos únicos.")
+toc_targets <- sub('^href="#([^"]+)"$', '\\1',
+                   extract_matches('href="#[^"]+"', toc_html))
+if (length(toc_targets) != 17L || anyDuplicated(toc_targets)) {
+  stop("O sumário deve conter 17 destinos internos únicos.")
+}
+
+report_element_ids <- c(
+  "fig-modelo-estrutural", "fig-crm-discriminacao",
+  "fig-crm-dificuldade", "fig-crm-escala",
+  "fig-crm-discriminacao-escala", "fig-estimativas-beta1",
+  "fig-estimativas-theta", "tab-parametros-itens"
+)
+missing_element_ids <- setdiff(report_element_ids, html_ids)
+unlinked_elements <- setdiff(report_element_ids, fragment_links)
+if (length(missing_element_ids) > 0L || length(unlinked_elements) > 0L) {
+  stop(
+    "Referências cruzadas incompletas. Destinos ausentes: ",
+    paste(missing_element_ids, collapse = ", "),
+    "; elementos sem hiperlink: ", paste(unlinked_elements, collapse = ", ")
+  )
 }
 
 reference_ids <- gsub('^<p id="|">$', '',
@@ -179,7 +199,9 @@ required_chunks <- c(
   "parametros-verdadeiros", "geracao-crm", "geracao-desfecho",
   "estimacao-em", "regressao-duas-etapas", "especificacao-jags",
   "amostragem-jags", "diagnostico-cadeias", "vies-rmse",
-  "figura-1", "figura-2", "tabela-1", "figura-3"
+  "figura-1", "curvas-crm-funcoes", "figura-2-discriminacao",
+  "figura-3-dificuldade", "figura-4-escala",
+  "figura-5-discriminacao-escala", "figura-6", "tabela-1", "figura-7"
 )
 missing_chunks <- required_chunks[!vapply(
   required_chunks,

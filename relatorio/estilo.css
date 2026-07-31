@@ -309,14 +309,15 @@ td:nth-child(2) {
   text-align: left;
 }
 
-.references,
-.references p {
-  text-align: left;
+.references {
+  text-align: justify;
 }
 
 .references p {
   font-size: 0.93rem;
   margin-bottom: 0.85rem;
+  text-align: justify;
+  text-align-last: left;
 }
 
 .references p[id^="ref-"] {
@@ -326,10 +327,17 @@ td:nth-child(2) {
 .report-content h1:target,
 .report-content h2:target,
 .report-content h3:target,
+.figure-title:target,
+.table-title:target,
 .references p:target {
   background: #fff3eb;
   border-radius: 0.15rem;
   box-shadow: 0 0 0 0.42rem #fff3eb;
+}
+
+.figure-title,
+.table-title {
+  scroll-margin-top: 1rem;
 }
 
 @media (max-width: 960px) {
@@ -393,6 +401,8 @@ td:nth-child(2) {
   .report-content h1:target,
   .report-content h2:target,
   .report-content h3:target,
+  .figure-title:target,
+  .table-title:target,
   .references p:target {
     background: transparent;
     box-shadow: none;

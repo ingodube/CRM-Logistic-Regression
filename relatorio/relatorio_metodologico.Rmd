@@ -60,9 +60,9 @@ Assim sendo, este trabalho tem como objetivo geral utilizar a variável latente 
 
 O modelo proposto considera um único traço latente $\theta_i$, definido em escala contínua para cada indivíduo $i = 1, 2, \ldots, n$. Além disso, seja $Y_{ij}$ as variáveis indicadoras observadas com $j = 1, 2, \ldots, p$, também definidas na escala contínua. Neste contexto, é definido o modelo de mensuração do construto em que as variações dos indicadores são explicadas pela variação do traço latente ([Bollen, 1989](#ref-bollen-1989)).
 
-Seja $W_i$ uma variável de desfecho observada, denotada por resposta distal, cujo preditor não é observado diretamente. Neste caso, é definida a regressão estrutural, em que $W_i$ é modelado condicionalmente a $\theta_i$. Dessa forma, o Modelo Estrutural apresentado na Figura 1 representa a combinação de um Modelo de Mensuração com a Regressão Estrutural [Kline (1998)](#ref-kline-1998).
+Seja $W_i$ uma variável de desfecho observada, denotada por resposta distal, cujo preditor não é observado diretamente. Neste caso, é definida a regressão estrutural, em que $W_i$ é modelado condicionalmente a $\theta_i$. Dessa forma, o Modelo Estrutural apresentado na [Figura 1](#fig-modelo-estrutural) representa a combinação de um Modelo de Mensuração com a Regressão Estrutural [Kline (1998)](#ref-kline-1998).
 
-<div class="figure-title">Figura 1: Representação por diagrama de caminhos de um Modelo Estrutural.</div>
+<div id="fig-modelo-estrutural" class="figure-title">Figura 1: Representação por diagrama de caminhos de um Modelo Estrutural.</div>
 
 ```{r figura-1, echo=FALSE, eval=TRUE, out.width="92%"}
 knitr::include_graphics("figuras/figura-1-modelo-estrutural.png")
@@ -101,6 +101,316 @@ Para implementar o ajuste de qualquer modelo da TRI para a estimação de um ún
 
 Adicionalmente, as respostas aos itens precisam ser independentes quando condicionadas ao traço latente. Conforme visto por [Hambleton et al. (1991)](#ref-hambleton-1991), a unidimensionalidade implica independência local, portanto a verificação da primeira suposição já garante que a segunda também é verdadeira. Por fim, há uma terceira suposição de que o traço latente está distribuído seguindo uma distribuição Normal padrão. Apesar de estudos aplicados com a TRI se basearem nesta suposição, é possível ajustar modelos da TRI considerando distribuições não normais para o traço latente ([Zhang et al., 2021](#ref-zhang-2021)).
 
+### Interpretação dos parâmetros {#interpretacao-parametros}
+
+A interpretação dos parâmetros do CRM pode ser feita pelas curvas características acumuladas. Seguindo a formulação de [Samejima (1969)](#ref-samejima-1969) e sua extensão para respostas contínuas ([Samejima, 1973](#ref-samejima-1973)), para um ponto de corte $\lambda$, tal que $0 < \lambda < k_j$, define-se:
+
+$$
+z_{j\lambda}=\ln\left(\frac{\lambda}{k_j-\lambda}\right),
+$$
+
+e, a partir da reparametrização de [Wang e Zeng (1998)](#ref-wang-1998), a probabilidade acumulada de o indivíduo $i$ apresentar uma resposta no item $j$ igual ou superior a $\lambda$ é:
+
+$$
+P(Y_{ij}\geq\lambda\mid\theta_i)=
+\Phi\left[a_j\left(\theta_i-b_j-
+\frac{1}{\alpha_j}\ln\left(\frac{\lambda}{k_j-\lambda}\right)\right)\right].
+$$
+
+O parâmetro $a_j$ controla a inclinação das curvas e, portanto, a capacidade de discriminação do item. Valores elevados de $a_j$ produzem transições mais íngremes entre probabilidades baixas e altas, distinguindo com maior precisão indivíduos com níveis próximos de $\theta$. Valores reduzidos produzem curvas mais planas e respostas mais ruidosas em relação ao traço latente. No CRM normal, a informação fornecida pelo item é constante ao longo da escala e corresponde a:
+
+$$
+I_j(\theta)=a_j^2.
+$$
+
+Consequentemente, a informação total de um teste com $p$ itens é aditiva, de modo que:
+
+$$
+I(\theta)=\sum_{j=1}^{p}I_j(\theta)=\sum_{j=1}^{p}a_j^2.
+$$
+
+Assim, itens com maior discriminação fornecem mais informação e reduzem o erro-padrão associado à estimação do traço. A [Figura 2](#fig-crm-discriminacao) ilustra esse comportamento mantendo $b_j$ e $\alpha_j$ fixos.
+
+```{r curvas-crm-funcoes, eval=TRUE}
+# Pacotes --------------------------------------------------------------------
+library(ggplot2)
+library(dplyr)
+library(patchwork)
+
+# Modelo TRI contínua - CRM --------------------------------------------------
+# No artigo, o parâmetro de escala é denotado por alpha.
+#
+# P(Y >= lambda | theta) = Phi[v]
+#
+# v = a * (theta - b - (1/alpha) * log(lambda/(k - lambda)))
+#
+# em que:
+# a      = discriminação do item
+# b      = dificuldade do item
+# alpha  = parâmetro de escala do item
+# k      = limite superior da escala contínua de resposta
+# lambda = ponto de corte da escala de resposta, com 0 < lambda < k
+
+crm_p_ge_lambda = function(theta, lambda, a, b, alpha, k){
+  v = a * (theta - b - (1 / alpha) * log(lambda / (k - lambda)))
+  pnorm(v)
+}
+
+# Sequência de habilidade ----------------------------------------------------
+theta = seq(-8, 8, length.out = 500)
+
+# Limite superior da escala contínua de resposta
+# Exemplo: respostas variando de 0 a 5
+k = 5
+
+# Pontos de corte usados para desenhar as curvas cumulativas
+# Como 0 < lambda < k, usamos lambda = 1, 2, 3, 4
+lambda_values = 1:4
+
+# Função para montar base de dados do CRM ------------------------------------
+montar_dados_crm = function(theta, a_values, b_values, alpha_values,
+                            k = 5, lambda_values = 1:4){
+
+  stopifnot(length(a_values) == length(b_values))
+  stopifnot(length(a_values) == length(alpha_values))
+  stopifnot(all(lambda_values > 0))
+  stopifnot(all(lambda_values < k))
+
+  n_itens = length(a_values)
+
+  dados_curvas = expand.grid(
+    theta = theta,
+    item = 1:n_itens,
+    lambda = lambda_values
+  ) %>%
+    mutate(
+      a = a_values[item],
+      b = b_values[item],
+      alpha = alpha_values[item],
+
+      P_ge_lambda = crm_p_ge_lambda(
+        theta = theta,
+        lambda = lambda,
+        a = a,
+        b = b,
+        alpha = alpha,
+        k = k
+      ),
+
+      lambda_fator = factor(
+        lambda,
+        levels = lambda_values
+      )
+    )
+
+  return(dados_curvas)
+}
+
+# Função para plotar cada item ------------------------------------------------
+plot_item_crm = function(i, dados_curvas){
+
+  df_prob = dados_curvas %>%
+    filter(item == i)
+
+  a_i = unique(df_prob$a)
+  b_i = unique(df_prob$b)
+  alpha_i = unique(df_prob$alpha)
+  lambda_i = sort(unique(df_prob$lambda))
+
+  ggplot(df_prob, aes(theta, P_ge_lambda, color = lambda_fator)) +
+
+    geom_line(linewidth = 1) +
+
+    coord_cartesian(ylim = c(0, 1)) +
+
+    labs(
+      title = bquote(
+        "Item " ~ .(i) ~ ":  " ~
+          a == .(a_i) ~ "   " ~
+          b == .(b_i) ~ "   " ~
+          alpha == .(alpha_i)
+      ),
+      x = expression(theta),
+      y = expression(P(Y >= lambda ~ "|" ~ theta)),
+      color = expression(lambda)
+    ) +
+
+    scale_color_viridis_d(
+      option = "plasma",
+      direction = -1,
+      labels = parse(text = paste0("lambda == ", lambda_i))
+    ) +
+
+    theme_classic()
+}
+
+# Função para montar painel de itens -----------------------------------------
+plot_cenario_crm = function(nome_cenario, a_values, b_values, alpha_values,
+                            theta = theta, k = 5, lambda_values = 1:4){
+
+  dados_curvas = montar_dados_crm(
+    theta = theta,
+    a_values = a_values,
+    b_values = b_values,
+    alpha_values = alpha_values,
+    k = k,
+    lambda_values = lambda_values
+  )
+
+  plots_itens = lapply(
+    seq_along(a_values),
+    function(i){
+      plot_item_crm(i, dados_curvas)
+    }
+  )
+
+  painel_itens = wrap_plots(
+    plots_itens,
+    ncol = 2,
+    guides = "collect"
+  ) +
+    plot_annotation(
+      title = nome_cenario
+    ) &
+    theme(
+      legend.position = "right"
+    )
+
+  return(
+    list(
+      dados = dados_curvas,
+      painel_itens = painel_itens
+    )
+  )
+}
+```
+
+<div id="fig-crm-discriminacao" class="figure-title">Figura 2: Curvas características acumuladas do CRM para diferentes valores do parâmetro de discriminação $a_j$, mantendo $b_j=0$ e $\alpha_j=1$.</div>
+
+```{r figura-2-discriminacao, eval=TRUE, fig.width=9.5, fig.height=7.2}
+# =============================================================================
+# 1) Exemplo variando as discriminações: parâmetro a
+# =============================================================================
+# Interpretação esperada:
+# - Quanto maior a, mais íngremes são as curvas P(Y >= lambda | theta).
+# - b e alpha são mantidos fixos.
+
+a_values = c(0.5, 1.0, 1.8, 3.0)
+b_values = c(0, 0, 0, 0)
+alpha_values = c(1, 1, 1, 1)
+
+cenario_a = plot_cenario_crm(
+  nome_cenario = NULL,
+  a_values = a_values,
+  b_values = b_values,
+  alpha_values = alpha_values,
+  theta = theta,
+  k = k,
+  lambda_values = lambda_values
+)
+
+print(cenario_a$painel_itens)
+```
+
+<div class="figure-source">Fonte: elaboração própria do autor.</div>
+
+O parâmetro $b_j$ determina a localização horizontal das curvas e representa o nível do traço latente exigido para que o indivíduo alcance uma mesma probabilidade acumulada. Conforme mostra a [Figura 3](#fig-crm-dificuldade), valores maiores deslocam todas as curvas do item para a direita, enquanto valores menores as deslocam para a esquerda. Como $b_j$ altera a localização, mas não a inclinação das curvas, ele não modifica $I_j(\theta)=a_j^2$.
+
+<div id="fig-crm-dificuldade" class="figure-title">Figura 3: Curvas características acumuladas do CRM para diferentes valores do parâmetro de dificuldade $b_j$, mantendo $a_j=1{,}5$ e $\alpha_j=1$.</div>
+
+```{r figura-3-dificuldade, eval=TRUE, fig.width=9.5, fig.height=7.2}
+# =============================================================================
+# 2) Exemplo variando as dificuldades: parâmetro b
+# =============================================================================
+# Interpretação esperada:
+# - Quanto maior b, mais à direita ficam as curvas.
+# - Itens com maior b exigem maior theta para atingir a mesma probabilidade
+#   acumulada P(Y >= lambda | theta).
+# - a e alpha são mantidos fixos.
+
+a_values = c(1.5, 1.5, 1.5, 1.5)
+b_values = c(-2.0, -0.5, 1.0, 2.5)
+alpha_values = c(1, 1, 1, 1)
+
+cenario_b = plot_cenario_crm(
+  nome_cenario = NULL,
+  a_values = a_values,
+  b_values = b_values,
+  alpha_values = alpha_values,
+  theta = theta,
+  k = k,
+  lambda_values = lambda_values
+)
+
+print(cenario_b$painel_itens)
+```
+
+<div class="figure-source">Fonte: elaboração própria do autor.</div>
+
+O parâmetro $\alpha_j$ controla a escala da transformação entre a resposta observada e o traço latente. Na distribuição da Equação (3), a variância condicional é $\alpha_j^2/a_j^2$; nas curvas acumuladas, $\alpha_j$ também regula a distância horizontal entre os pontos de corte. Valores menores ampliam o espaçamento entre as curvas associadas aos diferentes valores de $\lambda$, enquanto valores maiores aproximam essas curvas. A [Figura 4](#fig-crm-escala) evidencia que esse parâmetro afeta a forma como a escala contínua de respostas é discretizada em níveis acumulados.
+
+<div id="fig-crm-escala" class="figure-title">Figura 4: Curvas características acumuladas do CRM para diferentes valores do parâmetro de escala $\alpha_j$, mantendo $a_j=1{,}5$ e $b_j=0$.</div>
+
+```{r figura-4-escala, eval=TRUE, fig.width=9.5, fig.height=7.2}
+# =============================================================================
+# 3) Exemplo variando as escalas: parâmetro alpha
+# =============================================================================
+# Interpretação esperada:
+# - O parâmetro alpha controla a transformação entre a escala original de
+#   resposta Y e a escala latente theta.
+# - Valores menores de alpha aumentam a distância horizontal entre as curvas
+#   P(Y >= lambda | theta) associadas aos diferentes pontos de corte lambda.
+# - Valores maiores de alpha aproximam essas curvas.
+# - a e b são mantidos fixos.
+
+a_values = c(1.5, 1.5, 1.5, 1.5)
+b_values = c(0, 0, 0, 0)
+alpha_values = c(0.5, 0.8, 1.5, 3.0)
+
+cenario_alpha = plot_cenario_crm(
+  nome_cenario = NULL,
+  a_values = a_values,
+  b_values = b_values,
+  alpha_values = alpha_values,
+  theta = theta,
+  k = k,
+  lambda_values = lambda_values
+)
+
+print(cenario_alpha$painel_itens)
+```
+
+<div class="figure-source">Fonte: elaboração própria do autor.</div>
+
+Os parâmetros $a_j$ e $\alpha_j$ atuam conjuntamente no formato das curvas. O primeiro controla principalmente a inclinação e a informação do item, enquanto o segundo controla o espaçamento entre os limiares transformados. Assim, itens com a mesma localização podem apresentar combinações muito distintas de precisão e separação entre níveis de resposta. A [Figura 5](#fig-crm-discriminacao-escala) reúne quatro combinações e permite observar essa interação.
+
+<div id="fig-crm-discriminacao-escala" class="figure-title">Figura 5: Curvas características acumuladas do CRM para diferentes combinações dos parâmetros de discriminação $a_j$ e escala $\alpha_j$, mantendo $b_j=0$.</div>
+
+```{r figura-5-discriminacao-escala, eval=TRUE, fig.width=9.5, fig.height=7.2}
+# =============================================================================
+# 4) Exemplo adicional: parâmetros semelhantes aos itens hipotéticos do artigo
+# =============================================================================
+# O artigo ilustra itens com diferentes valores de a, b e alpha.
+
+a_values = c(1.0, 0.2, 0.2, 2.5)
+b_values = c(0.0, 0.0, 0.0, 0.0)
+alpha_values = c(1.0, 0.2, 2.5, 0.2)
+
+cenario_artigo = plot_cenario_crm(
+  nome_cenario = NULL,
+  a_values = a_values,
+  b_values = b_values,
+  alpha_values = alpha_values,
+  theta = theta,
+  k = k,
+  lambda_values = lambda_values
+)
+
+print(cenario_artigo$painel_itens)
+```
+
+<div class="figure-source">Fonte: elaboração própria do autor.</div>
+
 ## Regressão Logística {#regressao-logistica}
 
 A Regressão Logística não modela diretamente o desfecho, mas sim a probabilidade condicional de que a variável resposta assuma o valor 1 (sucesso) dado um conjunto de preditores ([Cox e Hinkley, 1979](#ref-cox-1979)). Seja $W_i$ a resposta distal binária para o i-ésimo indivíduo (i.e., $W_i \in \{0,1\}$, $\forall i = 1, 2, \cdots, n$), a Equação (4) descreve a função logito, a qual lineariza a relação entre um preditor observado $X$ e o desfecho binário:
@@ -124,7 +434,7 @@ $$
 
 ## Métodos de Estimação {#metodos-estimacao}
 
-Considerando o CRM como modelo de mensuração e a regressão logística como a regressão estrutural, o processo de estimação deve ser capaz de estimar o modelo que esteja de acordo com a estrutura apresentada na Figura 1. Para tanto, serão comparadas a abordagem de estimação em duas etapas, e a estimação simultânea da TRI e da regressão.
+Considerando o CRM como modelo de mensuração e a regressão logística como a regressão estrutural, o processo de estimação deve ser capaz de estimar o modelo que esteja de acordo com a estrutura apresentada na [Figura 1](#fig-modelo-estrutural). Para tanto, serão comparadas a abordagem de estimação em duas etapas, e a estimação simultânea da TRI e da regressão.
 
 ### Estimação em Duas Etapas {#estimacao-duas-etapas}
 
@@ -383,11 +693,11 @@ RMSE_alpha = sqrt(rowMeans(
 
 # Resultados Numéricos {#resultados-numericos}
 
-A avaliação numérica teve como finalidade, a comparação do desempenho da estimação frequentista em duas etapas e da estimação bayesiana conjunta conforme discutido na seção 2. A Figura 2 indica um comportamento distinto entre os dois métodos ao longo dos cenários amostrais.
+A avaliação numérica teve como finalidade, a comparação do desempenho da estimação frequentista em duas etapas e da estimação bayesiana conjunta conforme discutido na seção 2. A [Figura 6](#fig-estimativas-beta1) indica um comportamento distinto entre os dois métodos ao longo dos cenários amostrais.
 
-<div class="figure-title">Figura 2: Comparação das estimativas de $\beta_1$ em relação ao valor verdadeiro (linha tracejada) para cada cenário simulado testado.</div>
+<div id="fig-estimativas-beta1" class="figure-title">Figura 6: Comparação das estimativas de $\beta_1$ em relação ao valor verdadeiro (linha tracejada) para cada cenário simulado testado.</div>
 
-```{r figura-2, echo=FALSE, eval=TRUE, fig.width=9.4, fig.height=5.8}
+```{r figura-6, echo=FALSE, eval=TRUE, fig.width=9.4, fig.height=5.8}
 library(ggplot2)
 beta_resultados = read.csv("dados/beta_1_estimativas.csv",
                            check.names = FALSE)
@@ -420,11 +730,11 @@ Curiosamente, para esses mesmos tamanhos amostrais, as estimativas de $\beta_1$ 
 
 Por outro lado, para amostras maiores ($n = 500$ e $n = 1000$), nota-se uma melhora expressiva no comportamento da estimação conjunta, cujas estimativas de $\beta_1$ se concentram mais próximas do valor verdadeiro com redução clara da dispersão entre as replicações. Esse padrão é compatível com a expectativa de que a estimação simultânea se beneficie do aumento de informação amostral, pois amostras maiores fornecem mais evidência tanto para a identificação do traço latente quanto para a estimação da associação estrutural entre $\theta$ e $W$.
 
-Além disso, a Tabela 1 avalia a qualidade dos estimadores dos parâmetros dos itens em ambos os métodos testados no estudo com dados simulados.
+Além disso, a [Tabela 1](#tab-parametros-itens) avalia a qualidade dos estimadores dos parâmetros dos itens em ambos os métodos testados no estudo com dados simulados.
 
-A análise dos resultados da Tabela 1 conclui que não houve mudanças substanciais no vício ou RMSE das estimativas dos parâmetros dos itens quando ambos os métodos são comparados. Essa é uma conclusão importante, visto que a permite inferir que a estimação simultânea do CRM e da regressão não afeta a estimação dos parâmetros dos itens. Desse modo, permanece-se preservada uma das grandes vantagens de se usar a TRI, que é a interpretação de cada um dos itens de um teste através de seus parâmetros de discriminação, dificuldade ou de escala.
+A análise dos resultados da [Tabela 1](#tab-parametros-itens) conclui que não houve mudanças substanciais no vício ou RMSE das estimativas dos parâmetros dos itens quando ambos os métodos são comparados. Essa é uma conclusão importante, visto que a permite inferir que a estimação simultânea do CRM e da regressão não afeta a estimação dos parâmetros dos itens. Desse modo, permanece-se preservada uma das grandes vantagens de se usar a TRI, que é a interpretação de cada um dos itens de um teste através de seus parâmetros de discriminação, dificuldade ou de escala.
 
-<div class="table-title">Tabela 1: Comparação entre os métodos de estimação em duas etapas e conjunto para os parâmetros dos itens no CRM.</div>
+<div id="tab-parametros-itens" class="table-title">Tabela 1: Comparação entre os métodos de estimação em duas etapas e conjunto para os parâmetros dos itens no CRM.</div>
 
 ```{r tabela-1, echo=FALSE, eval=TRUE, results='asis'}
 tabela = read.csv("dados/tabela_parametros.csv",
@@ -447,11 +757,11 @@ cat('</tbody></table>')
 
 <div class="figure-source">Fonte: elaboração própria do autor.</div>
 
-Outro ponto importante da análise é a estimação do traço latente para todos os $n$ indivíduos, haja vista que o traço latente é o preditor da regressão logística e, portanto, imprescindível para explicar o comportamento de $\widehat{\beta}_1$ observado na Figura 2.
+Outro ponto importante da análise é a estimação do traço latente para todos os $n$ indivíduos, haja vista que o traço latente é o preditor da regressão logística e, portanto, imprescindível para explicar o comportamento de $\widehat{\beta}_1$ observado na [Figura 6](#fig-estimativas-beta1).
 
-<div class="figure-title">Figura 3: Comparação das estimativas médias dos $\theta_i$ em relação ao seu respectivo valor verdadeiro para cada cenário simulado testado.</div>
+<div id="fig-estimativas-theta" class="figure-title">Figura 7: Comparação das estimativas médias dos $\theta_i$ em relação ao seu respectivo valor verdadeiro para cada cenário simulado testado.</div>
 
-```{r figura-3, echo=FALSE, eval=TRUE, fig.width=9.5, fig.height=7.2}
+```{r figura-7, echo=FALSE, eval=TRUE, fig.width=9.5, fig.height=7.2}
 theta_resultados = read.csv("dados/theta_medias.csv",
                             check.names = FALSE)
 theta_resultados$n = factor(theta_resultados$n,
@@ -477,13 +787,13 @@ ggplot(theta_resultados,
 
 <div class="figure-source">Fonte: elaboração própria do autor.</div>
 
-A Figura 3 mostra que, em todos os cenários, a média dos $\widehat{\theta}_i$ se alinha de forma bastante próxima aos respectivos valores verdadeiros. A nuvem de pontos acompanha a reta de identidade, sugerindo que tanto o método em duas etapas quanto o método conjunto preservam bem a ordenação dos indivíduos no traço latente. Em contrapartida, a principal diferença entre os métodos não está na média, mas na dispersão. No método em duas etapas, o desvio-padrão dos $\widehat{\theta}_i$ fica praticamente igual a 1 em todos os tamanhos amostrais simulados. No entanto, os desvios-padrão são menores: 0.918, 0.957, 0.968 e 0.974, respectivamente. Isso sugere uma contração dos $\widehat{\theta}_i$ no método conjunto, isto é, os valores estimados tendem a ficar um pouco mais concentrados em torno de zero.
+A [Figura 7](#fig-estimativas-theta) mostra que, em todos os cenários, a média dos $\widehat{\theta}_i$ se alinha de forma bastante próxima aos respectivos valores verdadeiros. A nuvem de pontos acompanha a reta de identidade, sugerindo que tanto o método em duas etapas quanto o método conjunto preservam bem a ordenação dos indivíduos no traço latente. Em contrapartida, a principal diferença entre os métodos não está na média, mas na dispersão. No método em duas etapas, o desvio-padrão dos $\widehat{\theta}_i$ fica praticamente igual a 1 em todos os tamanhos amostrais simulados. No entanto, os desvios-padrão são menores: 0.918, 0.957, 0.968 e 0.974, respectivamente. Isso sugere uma contração dos $\widehat{\theta}_i$ no método conjunto, isto é, os valores estimados tendem a ficar um pouco mais concentrados em torno de zero.
 
 Em se tratando de como a estimação do traço latente afeta o comportamento de $\widehat{\beta}_1$, nos cenários menores, especialmente $n = 100$ e $n = 250$, o método conjunto apresentou maior dispersão e tendência de superestimação de $\beta_1$. Isso pode estar relacionado ao fato de que, nesses cenários, os thetas estimados pelo método conjunto estão mais comprimidos em relação à escala verdadeira. Quando a variável latente usada na regressão tem menor variabilidade, o coeficiente associado a ela pode aumentar para representar a mesma relação com o desfecho, contribuindo para estimativas maiores de $\beta_1$. Adicionalmente, em pequenas amostras, a estimação simultânea da variável latente, parâmetros dos itens e parâmetros da regressão adiciona instabilidade, o que se reflete na maior dispersão dos boxplots.
 
 # Conclusão e Trabalhos Futuros {#conclusao-trabalhos-futuros}
 
-Os resultados apresentados na seção 3 demonstram que, de fato, tratar uma variável latente como observada incorre na subestimação de seu efeito sobre uma outra variável mensurada diretamente. Isso pode ser verificado na análise da Figura 2, sobretudo em tamanhos amostrais maiores. Como solução, a estimação conjunta da TRI e da regressão parece atenuar o problema do viés de $\widehat{\beta}_1$, principalmente considerando amostras grandes. Além disso, conforme visto na Tabela 1, não existe prejuízo significativo da estimação dos parâmetros dos itens no método de estimação conjunta quando comparado ã estimação em duas etapas. Desse modo, pode-se dizer que assintoticamente o método de estimação conjunta apresenta propriedades satisfatórias e tende a ser melhor que a estimação em duas etapas.
+Os resultados apresentados na seção 3 demonstram que, de fato, tratar uma variável latente como observada incorre na subestimação de seu efeito sobre uma outra variável mensurada diretamente. Isso pode ser verificado na análise da [Figura 6](#fig-estimativas-beta1), sobretudo em tamanhos amostrais maiores. Como solução, a estimação conjunta da TRI e da regressão parece atenuar o problema do viés de $\widehat{\beta}_1$, principalmente considerando amostras grandes. Além disso, conforme visto na [Tabela 1](#tab-parametros-itens), não existe prejuízo significativo da estimação dos parâmetros dos itens no método de estimação conjunta quando comparado ã estimação em duas etapas. Desse modo, pode-se dizer que assintoticamente o método de estimação conjunta apresenta propriedades satisfatórias e tende a ser melhor que a estimação em duas etapas.
 
 Entretanto, alguns problemas ainda precisam ser estudados em relação ao método de estimação conjunta. Em primeiro lugar, essa abordagem é mais instável na estimação de $\beta_1$ quando o tamanho amostral é menor, inclusive, apontando o método de estimação em duas etapas como mais estável e menos viesado. Em segundo, a estimação conjunta pelo método bayesiano ligeiramente subestima a dispersão dos $\theta_i$, principalmente em tamanhos amostrais menores. Isso pode ser um fator que explica superestimação excessiva de $\beta_1$ pelo método conjunto em pequenas amostras. Portanto, há de se estudar melhorias para a estimação simultânea, sobretudo em pequenas amostras.
 
