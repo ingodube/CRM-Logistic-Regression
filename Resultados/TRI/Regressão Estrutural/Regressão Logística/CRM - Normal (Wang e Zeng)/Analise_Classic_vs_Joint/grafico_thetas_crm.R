@@ -29,7 +29,7 @@ library(tidyr)
 library(purrr)
 library(openxlsx)
 
-root_dir <- normalizePath(file.path(dirname(if (sys.nframe() > 0 && !is.null(sys.frame(1)$ofile)) sys.frame(1)$ofile else sub("^--file=", "", grep("^--file=", commandArgs(trailingOnly = FALSE), value = TRUE)[1])), ".."), winslash = "/", mustWork = TRUE)
+root_dir <- normalizePath(file.path(dirname(gsub("~+~", " ", if (sys.nframe() > 0 && !is.null(sys.frame(1)$ofile)) sys.frame(1)$ofile else sub("^--file=", "", grep("^--file=", commandArgs(trailingOnly = FALSE), value = TRUE)[1]), fixed = TRUE)), ".."), winslash = "/", mustWork = TRUE)
 output_dir <- file.path(root_dir, "Analise_Classic_vs_Joint")
 dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
