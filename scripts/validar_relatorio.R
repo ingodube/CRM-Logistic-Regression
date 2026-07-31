@@ -2,6 +2,7 @@ args <- commandArgs(trailingOnly = TRUE)
 project_dir <- normalizePath(if (length(args) > 0) args[[1]] else getwd(), winslash = "/", mustWork = TRUE)
 html_path <- file.path(project_dir, "docs", "index.html")
 rmd_path <- file.path(project_dir, "relatorio", "relatorio_metodologico.Rmd")
+css_path <- file.path(project_dir, "relatorio", "estilo.css")
 
 if (!file.exists(html_path)) {
   stop("Relatório renderizado não encontrado: ", html_path)
@@ -10,6 +11,7 @@ if (!file.exists(html_path)) {
 html <- paste(readLines(html_path, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
 rmd_lines <- readLines(rmd_path, warn = FALSE, encoding = "UTF-8")
 rmd <- paste(rmd_lines, collapse = "\n")
+css <- paste(readLines(css_path, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
 plain <- gsub("<script[^>]*>.*?</script>", " ", html, perl = TRUE)
 plain <- gsub("<style[^>]*>.*?</style>", " ", plain, perl = TRUE)
 plain <- gsub("<[^>]+>", " ", plain, perl = TRUE)
@@ -78,6 +80,17 @@ if (grepl("script.src  = \"http", html, fixed = TRUE) ||
 
 if (!grepl("<math", html, fixed = TRUE)) {
   stop("As expressões matemáticas não foram incorporadas como MathML.")
+}
+
+math_rule <- regmatches(
+  css,
+  regexpr('(?s)\\.math\\.display,[[:space:]]*math\\[display="block"\\][[:space:]]*\\{[^}]+\\}',
+          css, perl = TRUE)
+)
+if (!length(math_rule) ||
+    grepl("overflow-x:[[:space:]]*auto", math_rule, perl = TRUE) ||
+    !grepl("overflow:[[:space:]]*visible", math_rule, perl = TRUE)) {
+  stop("As equações devem permanecer centralizadas e sem barras de rolagem.")
 }
 
 expected_source <- "Fonte: elaboração própria do autor."
