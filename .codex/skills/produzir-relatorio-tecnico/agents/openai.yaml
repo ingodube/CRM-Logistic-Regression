@@ -1,0 +1,4 @@
+interface:
+  display_name: "Produzir relatório técnico"
+  short_description: "Renderiza e publica o relatório metodológico"
+  default_prompt: "Use $produzir-relatorio-tecnico para atualizar, validar e publicar o relatório metodológico deste repositório."

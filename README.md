@@ -1,23 +1,17 @@
 # CRM Logistic Regression
 
-Este repositório reúne dados simulados, scripts R e resultados de modelos de regressão logística com TRI. O fluxo reproduzível oficial utiliza somente R; arquivos auxiliares legados em outras linguagens foram preservados, mas não são necessários para executar ou validar os scripts R.
+<p align="justify">Este repositório reúne dados simulados, scripts R e resultados de modelos de regressão logística com TRI. O fluxo reproduzível oficial utiliza somente R; arquivos auxiliares legados em outras linguagens foram preservados, mas não são necessários para executar ou validar os scripts R.</p>
 
 ## Relatório técnico
 
-O relatório metodológico, com a formulação dos modelos, a explicação detalhada das duas estratégias de estimação e os resultados numéricos, está disponível em:
+<p align="justify">O relatório metodológico apresenta:</p>
+
+- a especificação do Modelo de Respostas Contínuas e da regressão logística para o desfecho distal;
+- a interpretação dos parâmetros dos itens por meio das curvas características acumuladas;
+- os métodos de estimação em duas etapas e de estimação bayesiana conjunta;
+- o estudo com dados simulados, a verificação do ajuste e a comparação dos resultados numéricos.
 
 **[Acessar o relatório técnico em HTML](https://ingodube.github.io/CRM-Logistic-Regression/)**
-
-Para gerar a mesma versão localmente, execute:
-
-```powershell
-Rscript scripts/preparar_dados_relatorio.R
-Rscript scripts/renderizar_relatorio.R
-Rscript scripts/validar_relatorio.R
-Rscript scripts/comparar_texto_relatorio.R
-```
-
-Os blocos de simulação e estimação completa são exibidos no relatório, mas não são executados durante a renderização. As figuras e a tabela são produzidas a partir dos resultados já salvos.
 
 ## Estrutura
 
@@ -39,14 +33,14 @@ Os blocos de simulação e estimação completa são exibidos no relatório, mas
 
 ## Restaurar o ambiente
 
-Execute uma única vez:
+<p align="justify">Execute uma única vez:</p>
 
 ```r
 install.packages("renv")
 renv::restore()
 ```
 
-O pacote arquivado `mcmcplots` 0.4.3 é restaurado diretamente do arquivo oficial do CRAN registrado no `renv.lock`.
+<p align="justify">O pacote arquivado `mcmcplots` 0.4.3 é restaurado diretamente do arquivo oficial do CRAN registrado no `renv.lock`.</p>
 
 ## Validar antes de executar
 
@@ -54,22 +48,14 @@ O pacote arquivado `mcmcplots` 0.4.3 é restaurado diretamente do arquivo oficia
 Rscript scripts/validar_reprodutibilidade.R
 ```
 
-A validação não altera dados nem resultados. Ela verifica a sintaxe das 15 fontes R do projeto e, nos códigos analíticos de `Resultados`, confere os seletores de cenário, a portabilidade dos caminhos, os diretórios esperados, os pacotes e a disponibilidade do JAGS.
+<p align="justify">A validação não altera dados nem resultados. Ela verifica a sintaxe das 15 fontes R do projeto e, nos códigos analíticos de `Resultados`, confere os seletores de cenário, a portabilidade dos caminhos, os diretórios esperados, os pacotes e a disponibilidade do JAGS.</p>
 
 ## Executar um cenário
 
-Execute o arquivo completo com `Rscript` ou `source()`, pois a raiz do repositório é calculada pela localização do próprio script. Exemplo:
+<p align="justify">Execute o arquivo completo com `Rscript` ou `source()`, pois a raiz do repositório é calculada pela localização do próprio script. Exemplo:</p>
 
 ```powershell
 Rscript "Resultados/TRI/Regressão Estrutural/Regressão Logística/CRM - Normal (Wang e Zeng)/Classic/n = 100 p = 10/TRI Classic Reg. Log. n = 100 p = 10.R"
 ```
 
-Não execute apenas linhas isoladas no console: nesse modo o R não informa o caminho do arquivo de origem. Os caminhos devem continuar sendo construídos com `file.path()` e relativos à raiz do repositório.
-
-## Convenção durável de diretórios
-
-- Nunca registrar caminhos pessoais, letras de unidade ou diretórios iniciados por `~`.
-- Derivar a raiz a partir do arquivo em execução.
-- Usar `file.path()` para entradas e saídas.
-- Usar `dir.create(..., recursive = TRUE, showWarnings = FALSE)` antes de gravar em uma nova pasta.
-- Preservar `Dados Simulados/` e evitar testes que sobrescrevam `Resultados/`.
+<p align="justify">Não execute apenas linhas isoladas no console: nesse modo o R não informa o caminho do arquivo de origem. Os caminhos devem continuar sendo construídos com `file.path()` e relativos à raiz do repositório.</p>
