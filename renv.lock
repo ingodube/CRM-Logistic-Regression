@@ -2233,7 +2233,15 @@
       "Source": "URL",
       "RemoteType": "url",
       "RemoteUrl": "https://cran.r-project.org/src/contrib/Archive/mcmcplots/mcmcplots_0.4.3.tar.gz",
-      "Path": "C:\\Users\\ingon\\AppData\\Local/R/cache/R/renv/source/url/a9d5afd23a9346e777981368ad79f8ce.tar.gz"
+      "Path": "C:\\Users\\ingon\\AppData\\Local/R/cache/R/renv/source/url/a9d5afd23a9346e777981368ad79f8ce.tar.gz",
+      "Depends": [
+        "coda (>= 0.17.1)"
+      ],
+      "Imports": [
+        "sfsmisc",
+        "colorspace",
+        "denstrip"
+      ]
     },
     "memoise": {
       "Package": "memoise",
