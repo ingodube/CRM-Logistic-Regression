@@ -262,9 +262,7 @@ plot_cenario_crm = function(nome_cenario, a_values, b_values, alpha_values,
 }
 ```
 
-<div id="fig-crm-discriminacao" class="figure-title">Figura 2: Curvas características acumuladas do CRM para diferentes valores do parâmetro de discriminação $a_j$, mantendo $b_j=0$ e $\alpha_j=1$.</div>
-
-```{r figura-2-discriminacao, eval=TRUE, fig.width=9.5, fig.height=7.2}
+```{r figura-2-discriminacao, eval=TRUE}
 a_values = c(0.5, 1.0, 1.8, 3.0)
 b_values = c(0, 0, 0, 0)
 alpha_values = c(1, 1, 1, 1)
@@ -278,7 +276,11 @@ cenario_a = plot_cenario_crm(
   k = k,
   lambda_values = lambda_values
 )
+```
 
+<div id="fig-crm-discriminacao" class="figure-title">Figura 2: Curvas características acumuladas do CRM para diferentes valores do parâmetro de discriminação $a_j$, mantendo $b_j=0$ e $\alpha_j=1$.</div>
+
+```{r figura-2-discriminacao-grafico, echo=FALSE, eval=TRUE, fig.width=9.5, fig.height=7.2}
 print(cenario_a$painel_itens)
 ```
 
@@ -288,9 +290,7 @@ Na [Figura 2](#fig-crm-discriminacao), o aumento de $a_j$ torna as curvas progre
 
 O parâmetro $b_j$ determina a localização horizontal das curvas e representa o nível do traço latente exigido para que o indivíduo alcance uma mesma probabilidade acumulada. Conforme mostra a [Figura 3](#fig-crm-dificuldade), valores maiores deslocam todas as curvas do item para a direita, enquanto valores menores as deslocam para a esquerda. Como $b_j$ altera a localização, mas não a inclinação das curvas, ele não modifica $I_j(\theta)=a_j^2$.
 
-<div id="fig-crm-dificuldade" class="figure-title">Figura 3: Curvas características acumuladas do CRM para diferentes valores do parâmetro de dificuldade $b_j$, mantendo $a_j=1{,}5$ e $\alpha_j=1$.</div>
-
-```{r figura-3-dificuldade, eval=TRUE, fig.width=9.5, fig.height=7.2}
+```{r figura-3-dificuldade, eval=TRUE}
 a_values = c(1.5, 1.5, 1.5, 1.5)
 b_values = c(-2.0, -0.5, 1.0, 2.5)
 alpha_values = c(1, 1, 1, 1)
@@ -304,7 +304,11 @@ cenario_b = plot_cenario_crm(
   k = k,
   lambda_values = lambda_values
 )
+```
 
+<div id="fig-crm-dificuldade" class="figure-title">Figura 3: Curvas características acumuladas do CRM para diferentes valores do parâmetro de dificuldade $b_j$, mantendo $a_j=1{,}5$ e $\alpha_j=1$.</div>
+
+```{r figura-3-dificuldade-grafico, echo=FALSE, eval=TRUE, fig.width=9.5, fig.height=7.2}
 print(cenario_b$painel_itens)
 ```
 
@@ -314,9 +318,7 @@ Na [Figura 3](#fig-crm-dificuldade), as curvas mantêm a mesma inclinação e o 
 
 O parâmetro $\alpha_j$ controla a escala da transformação entre a resposta observada e o traço latente. Na distribuição da Equação (3), a variância condicional é $\alpha_j^2/a_j^2$; nas curvas acumuladas, $\alpha_j$ também regula a distância horizontal entre os pontos de corte. Valores menores ampliam o espaçamento entre as curvas associadas aos diferentes valores de $\lambda$, enquanto valores maiores aproximam essas curvas. A [Figura 4](#fig-crm-escala) evidencia que esse parâmetro afeta a forma como a escala contínua de respostas é discretizada em níveis acumulados.
 
-<div id="fig-crm-escala" class="figure-title">Figura 4: Curvas características acumuladas do CRM para diferentes valores do parâmetro de escala $\alpha_j$, mantendo $a_j=1{,}5$ e $b_j=0$.</div>
-
-```{r figura-4-escala, eval=TRUE, fig.width=9.5, fig.height=7.2}
+```{r figura-4-escala, eval=TRUE}
 a_values = c(1.5, 1.5, 1.5, 1.5)
 b_values = c(0, 0, 0, 0)
 alpha_values = c(0.5, 0.8, 1.5, 3.0)
@@ -330,7 +332,11 @@ cenario_alpha = plot_cenario_crm(
   k = k,
   lambda_values = lambda_values
 )
+```
 
+<div id="fig-crm-escala" class="figure-title">Figura 4: Curvas características acumuladas do CRM para diferentes valores do parâmetro de escala $\alpha_j$, mantendo $a_j=1{,}5$ e $b_j=0$.</div>
+
+```{r figura-4-escala-grafico, echo=FALSE, eval=TRUE, fig.width=9.5, fig.height=7.2}
 print(cenario_alpha$painel_itens)
 ```
 
@@ -340,9 +346,7 @@ Na [Figura 4](#fig-crm-escala), valores menores de $\alpha_j$ produzem maior sep
 
 Os parâmetros $a_j$ e $\alpha_j$ atuam conjuntamente no formato das curvas. O primeiro controla principalmente a inclinação e a informação do item, enquanto o segundo controla o espaçamento entre os limiares transformados. Assim, itens com a mesma localização podem apresentar combinações muito distintas de precisão e separação entre níveis de resposta. A [Figura 5](#fig-crm-discriminacao-escala) reúne quatro combinações e permite observar essa interação.
 
-<div id="fig-crm-discriminacao-escala" class="figure-title">Figura 5: Curvas características acumuladas do CRM para diferentes combinações dos parâmetros de discriminação $a_j$ e escala $\alpha_j$, mantendo $b_j=0$.</div>
-
-```{r figura-5-discriminacao-escala, eval=TRUE, fig.width=9.5, fig.height=7.2}
+```{r figura-5-discriminacao-escala, eval=TRUE}
 a_values = c(1.0, 0.2, 0.2, 2.5)
 b_values = c(0.0, 0.0, 0.0, 0.0)
 alpha_values = c(1.0, 0.2, 2.5, 0.2)
@@ -356,7 +360,11 @@ cenario_artigo = plot_cenario_crm(
   k = k,
   lambda_values = lambda_values
 )
+```
 
+<div id="fig-crm-discriminacao-escala" class="figure-title">Figura 5: Curvas características acumuladas do CRM para diferentes combinações dos parâmetros de discriminação $a_j$ e escala $\alpha_j$, mantendo $b_j=0$.</div>
+
+```{r figura-5-discriminacao-escala-grafico, echo=FALSE, eval=TRUE, fig.width=9.5, fig.height=7.2}
 print(cenario_artigo$painel_itens)
 ```
 

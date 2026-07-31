@@ -201,8 +201,11 @@ required_chunks <- c(
   "estimacao-em", "regressao-duas-etapas", "especificacao-jags",
   "amostragem-jags", "diagnostico-cadeias", "vies-rmse",
   "figura-1", "curvas-crm-funcoes", "figura-2-discriminacao",
-  "figura-3-dificuldade", "figura-4-escala",
-  "figura-5-discriminacao-escala", "figura-6", "tabela-1", "figura-7"
+  "figura-2-discriminacao-grafico", "figura-3-dificuldade",
+  "figura-3-dificuldade-grafico", "figura-4-escala",
+  "figura-4-escala-grafico", "figura-5-discriminacao-escala",
+  "figura-5-discriminacao-escala-grafico", "figura-6", "tabela-1",
+  "figura-7"
 )
 missing_chunks <- required_chunks[!vapply(
   required_chunks,
@@ -225,6 +228,33 @@ for (chunk in curve_chunks) {
   chunk_code <- rmd_lines[seq.int(start + 1L, finish - 1L)]
   if (any(grepl("^[[:space:]]*#", chunk_code))) {
     stop("O bloco de construção da curva contém comentários: ", chunk)
+  }
+}
+
+curve_layout <- data.frame(
+  code = c(
+    "figura-2-discriminacao", "figura-3-dificuldade",
+    "figura-4-escala", "figura-5-discriminacao-escala"
+  ),
+  title = c(
+    "fig-crm-discriminacao", "fig-crm-dificuldade", "fig-crm-escala",
+    "fig-crm-discriminacao-escala"
+  ),
+  plot = c(
+    "figura-2-discriminacao-grafico", "figura-3-dificuldade-grafico",
+    "figura-4-escala-grafico", "figura-5-discriminacao-escala-grafico"
+  )
+)
+for (i in seq_len(nrow(curve_layout))) {
+  code_position <- grep(paste0("^```\\{r ", curve_layout$code[[i]],
+                               "(?:,|\\})"), rmd_lines, perl = TRUE)
+  title_position <- grep(paste0('^<div id="', curve_layout$title[[i]], '"'),
+                         rmd_lines)
+  plot_position <- grep(paste0("^```\\{r ", curve_layout$plot[[i]],
+                               "(?:,|\\})"), rmd_lines, perl = TRUE)
+  if (!(code_position < title_position && title_position < plot_position)) {
+    stop("A ordem deve ser código, título e gráfico para: ",
+         curve_layout$title[[i]])
   }
 }
 
