@@ -6,10 +6,10 @@
 
 <p align="justify">O relatório metodológico apresenta:</p>
 
-- a especificação do Modelo de Respostas Contínuas e da regressão logística para o desfecho distal;
-- a interpretação dos parâmetros dos itens por meio das curvas características acumuladas;
-- os métodos de estimação em duas etapas e de estimação bayesiana conjunta;
-- o estudo com dados simulados, a verificação do ajuste e a comparação dos resultados numéricos.
+- A especificação do Modelo de Respostas Contínuas e da regressão logística para o desfecho distal;
+- A interpretação dos parâmetros dos itens por meio das curvas características acumuladas;
+- Os métodos de estimação em duas etapas e de estimação bayesiana conjunta;
+- O estudo com dados simulados, a verificação do ajuste e a comparação dos resultados numéricos.
 
 **[Acessar o relatório técnico em HTML](https://ingodube.github.io/CRM-Logistic-Regression/)**
 
@@ -25,15 +25,14 @@
 - `scripts/comparar_texto_relatorio.R`: compara com o PDF, após normalização, as seções que devem ser preservadas literalmente.
 - `renv.lock`: versões fixadas dos pacotes R.
 
-## Pré-requisitos
+## Pré-requisitos para executar as simulações
 
 1. Instale o R 4.6.1 ou uma versão compatível.
-2. Instale o JAGS e confirme que ele pode ser carregado pelo pacote `rjags`.
-3. Abra um terminal na raiz deste repositório.
+2. Instale o software JAGS e confirme que ele pode ser carregado pelo pacote `rjags` dentro do R.
 
 ## Restaurar o ambiente
 
-<p align="justify">Execute uma única vez:</p>
+<p align="justify">Executar uma única vez:</p>
 
 ```r
 install.packages("renv")
