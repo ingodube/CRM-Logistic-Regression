@@ -15,7 +15,7 @@
 
 ## Estrutura
 
-- `Dados Simulados/`: entradas das simulações. Trate esses arquivos como dados-fonte e não os sobrescreva.
+- `Dados Simulados/`: entradas das simulações. Trate esses arquivos como dados-fonte e eles jamais devem ser sobreescritos.
 - `Resultados/`: scripts R, resultados numéricos e artefatos de análise.
 - `relatorio/`: fonte R Markdown, template Pandoc, estilo, figura extraída e dados derivados leves do relatório.
 - `docs/index.html`: relatório técnico autocontido publicado pelo GitHub Pages.
