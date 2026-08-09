@@ -1,6 +1,6 @@
 # CRM Logistic Regression
 
-<p align="justify">Este repositório reúne dados simulados, scripts R e resultados de modelos de regressão logística com TRI. O fluxo reproduzível oficial utiliza somente R; arquivos auxiliares legados em outras linguagens foram preservados, mas não são necessários para executar ou validar os scripts R.</p>
+<p align="justify">Este repositório reúne dados simulados, scripts R e resultados de modelos de regressão logística com TRI. O fluxo reproduzível oficial utiliza somente R; arquivos auxiliares legados em outras linguagens foram preservados, entretanto não são necessários para executar ou validar os scripts R.</p>
 
 ## Relatório técnico
 
