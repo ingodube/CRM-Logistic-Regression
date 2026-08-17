@@ -1,4 +1,0 @@
-interface:
-  display_name: "Auditar caminhos R"
-  short_description: "Audita caminhos portaveis em projetos R"
-  default_prompt: "Use $auditar-caminhos-r para auditar e validar os caminhos deste projeto R."

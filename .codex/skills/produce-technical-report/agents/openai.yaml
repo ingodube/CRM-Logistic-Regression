@@ -1,0 +1,4 @@
+interface:
+  display_name: "Produce technical report"
+  short_description: "Render and publish the bilingual methodological report"
+  default_prompt: "Use $produce-technical-report to update, validate, and publish this repository's bilingual methodological report."

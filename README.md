@@ -1,60 +1,63 @@
 # CRM Logistic Regression
 
-<p align="justify">Este repositório reúne dados simulados, scripts R e resultados de modelos de regressão logística com TRI. O fluxo reproduzível oficial utiliza somente R; arquivos auxiliares legados em outras linguagens foram preservados, entretanto não são necessários para executar ou validar os scripts R.</p>
+Reproducible R study comparing two-stage and joint Bayesian estimation for logistic regression with latent traits measured by the Continuous Response Model (CRM).
 
-## Relatório técnico
+## Technical report
 
-<p align="justify">O relatório metodológico apresenta:</p>
+The methodological report documents the CRM specification, logistic regression for a dichotomous distal outcome, item-parameter interpretation, the simulation design, model diagnostics, and numerical comparisons.
 
-- A especificação do Modelo de Respostas Contínuas e da regressão logística para o desfecho distal;
-- A interpretação dos parâmetros dos itens por meio das curvas características acumuladas;
-- Os métodos de estimação em duas etapas e de estimação bayesiana conjunta;
-- O estudo com dados simulados, a verificação do ajuste e a comparação dos resultados numéricos.
+- [Read the technical report in English](https://ingodube.github.io/CRM-Logistic-Regression/metodologia.html) — default and canonical version.
+- [Read the technical report in Portuguese (PT-BR)](https://ingodube.github.io/CRM-Logistic-Regression/methodology-pt-br.html).
 
-**[Acessar o relatório técnico em HTML](https://ingodube.github.io/CRM-Logistic-Regression/)**
+## Repository structure
 
-## Estrutura
+- `Codes (EN)/` and `Codes (PT-BR)/`: localized analytical R programs and lightweight analysis helpers. The English programs are generated deterministically from the reviewed PT-BR programs without changing statistical expressions or numeric literals.
+- `Spreadsheets (EN)/` and `Spreadsheets (PT-BR)/`: localized CSV and XLSX analytical tables.
+- `Results (EN)/` and `Results (PT-BR)/`: localized text, figure, PDF, TeX, JSON, and NDJSON results.
+- `Simulated Data/`: the single source-data tree. Its 19,000 files are preserved and must never be overwritten.
+- `report/`: the two R Markdown sources, shared figure, Pandoc template, CSS, and the protected PT-BR source PDF.
+- `docs/`: self-contained HTML publication. `index.html` redirects access to the English report.
+- `scripts/`: preparation, rendering, parity, preservation, and reproducibility validators.
+- `tools/`: deterministic localization tools for analytical code, CSV files, workbooks, and the English report.
+- `renv.lock`: pinned R package versions.
 
-- `Dados Simulados/`: entradas das simulações. Trate esses arquivos como dados-fonte e eles jamais devem ser sobreescritos.
-- `Resultados/`: scripts R, resultados numéricos e artefatos de análise.
-- `relatorio/`: fonte R Markdown, template Pandoc, estilo, figura extraída e dados derivados leves do relatório.
-- `docs/index.html`: relatório técnico autocontido publicado pelo GitHub Pages.
-- `scripts/validar_reprodutibilidade.R`: valida sintaxe, dependências e portabilidade dos caminhos sem executar as simulações.
-- `scripts/renderizar_relatorio.R`: localiza o Pandoc e renderiza o relatório técnico.
-- `scripts/validar_relatorio.R`: confere conteúdo, estrutura e incorporação das figuras no HTML.
-- `scripts/comparar_texto_relatorio.R`: compara com o PDF, após normalização, as seções que devem ser preservadas literalmente.
-- `renv.lock`: versões fixadas dos pacotes R.
+## Restore the environment
 
-## Pré-requisitos para executar as simulações
-
-1. Instale o R 4.6.1 ou uma versão compatível.
-2. Instale o software JAGS e confirme que ele pode ser carregado pelo pacote `rjags` dentro do R.
-
-## Restaurar o ambiente
-
-<p align="justify">Executar uma única vez:</p>
+Install R 4.6.1 or a compatible release and JAGS, then run:
 
 ```r
 install.packages("renv")
 renv::restore()
 ```
 
-<p align="justify">O pacote arquivado `mcmcplots` 0.4.3 é restaurado diretamente do arquivo oficial do CRAN registrado no `renv.lock`.</p>
+The archived `mcmcplots` 0.4.3 package is restored from the official CRAN archive recorded in `renv.lock`.
 
-## Validar antes de executar
+## Validate and render
 
-```powershell
-Rscript scripts/validar_reprodutibilidade.R
-```
-
-<p align="justify">A validação não altera dados nem resultados. Ela verifica a sintaxe das 15 fontes R do projeto e, nos códigos analíticos de `Resultados`, confere os seletores de cenário, a portabilidade dos caminhos, os diretórios esperados, os pacotes e a disponibilidade do JAGS.</p>
-
-## Executar um cenário
-
-<p align="justify">Execute o arquivo completo com `Rscript` ou `source()`, pois a raiz do repositório é calculada pela localização do próprio script. Exemplo:</p>
+Run the lightweight pipeline from the repository root:
 
 ```powershell
-Rscript "Resultados/TRI/Regressão Estrutural/Regressão Logística/CRM - Normal (Wang e Zeng)/Classic/n = 100 p = 10/TRI Classic Reg. Log. n = 100 p = 10.R"
+Rscript scripts/prepare_report_data.R
+Rscript scripts/render_reports.R
+Rscript scripts/validate_reports.R
+Rscript scripts/compare_report_text.R
+Rscript scripts/validate_reproducibility.R
+Rscript -e "renv::status()"
+git diff --check
 ```
 
-<p align="justify">Não execute apenas linhas isoladas no console: nesse modo o R não informa o caminho do arquivo de origem. Os caminhos devem continuar sendo construídos com `file.path()` e relativos à raiz do repositório.</p>
+These commands do not run the 1,000-replication simulation or the full MCMC estimation.
+
+## Run one analytical scenario
+
+Execute a complete localized program with `Rscript` or `source()`. For example:
+
+```powershell
+Rscript "Codes (EN)/IRT/Structural Regression/Logistic Regression/CRM - Normal (Wang and Zeng)/Classic/n = 100 p = 10/IRT Classic Logistic Regression n = 100 p = 10.R"
+```
+
+Do not execute isolated lines in the console because the program derives the repository root from its source-file path. Continue to build paths with `file.path()` relative to that root.
+
+## Contribution convention
+
+Use short, neutral, imperative commit messages in English, for example: `Publish edited report`.

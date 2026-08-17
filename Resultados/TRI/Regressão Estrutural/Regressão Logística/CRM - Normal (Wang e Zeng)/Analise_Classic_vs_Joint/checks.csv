@@ -1,2 +1,0 @@
-scenario,method,param,entity,bias,rmse,note
-n = 250 p = 10,Joint,a,Item 1,0.05856252870670864,0.10282295631019107,"Cheque independente da orientacao: linha = item, coluna = replicacao."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Audit R paths"
+  short_description: "Audit portable paths in bilingual R projects"
+  default_prompt: "Use $audit-r-paths to audit and validate this R project's localized paths."

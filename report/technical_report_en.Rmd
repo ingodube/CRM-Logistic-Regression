@@ -1,0 +1,956 @@
+---
+title: "Incorporating Measurement Error from Item Response Theory for Continuous Responses into Dichotomous Distal Outcomes: A Bayesian Approach"
+author: "Ingo Dube Souza"
+affiliation: "Graduate Program in Statistics and Data Science (PGECD/UFBA)"
+secondary-affiliation: "Economic Studies (SENAI/CIMATEC)"
+email: "ingo.dube@ufba.br"
+keywords: "IRT; Regression; Distal Outcome; MCMC; EM Algorithm."
+lang: en
+language-label: "Language"
+language-current: "EN"
+english-current: true
+keywords-label: "Keywords"
+toc-label: "Contents"
+english-url: "metodologia.html"
+portuguese-url: "methodology-pt-br.html"
+canonical-url: "https://ingodube.github.io/CRM-Logistic-Regression/metodologia.html"
+output:
+  html_document:
+    self_contained: true
+    toc: true
+    toc_float: false
+    number_sections: true
+    fig_caption: false
+    theme: null
+    math_method: mathml
+    template: technical-report.html
+    css: technical-report.css
+---
+
+```{r configuracao, include=FALSE, eval=TRUE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  eval = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  comment = NA,
+  fig.align = "center",
+  dpi = 150
+)
+options(width = 92, scipen = 999)
+```
+
+# Introduction {#introducao}
+
+Unlike the direct and explicit measurement variables commonly used in data science, complex phenomena such as skills and behaviors constitute latent variables, whose unobservable nature implies inherent subjectivity and measurement error. Originated in [Spearman (1904)](#ref-spearman-1904)'s studies on human intelligence and founding the development of Factor Analysis, this concept defines such variables as theoretical constructs that, although not subject to direct observation, can be statistically estimated through observed indicators ([Bollen, 1989](#ref-bollen-1989)).
+
+The type of method used to model latent variables depends on whether the construct is on a continuous scale, or is divided into latent classes. Likewise, the nature of the indicators, whether continuous or categorical, also influences the choice of methodology used. One of the approaches used in the literature is Item Response Theory (IRT), which models the relationship between a latent trait on a continuous scale and the probability of an individual obtaining a certain result on a test ([Hambleton et al., 1991](#ref-hambleton-1991)). Despite the wide use of IRT in the psychometric or educational assessment context, IRT has a multidisciplinary character and can be applied in the most diverse areas of knowledge ([Hays et al., 2007](#ref-hays-2007); [Knoll and Houts, 2012](#ref-knoll-2012); [Hare and Poole, 2018](#ref-hare-2018)).
+
+The initial IRT models proposed by [Lord (1952)](#ref-lord-1952), [Rasch (1960)](#ref-rasch-1960) and [Birnbaum (1968)](#ref-birnbaum-1968) consider dichotomous items, that is, whether an individual responded correctly to a test item or not. Subsequently, [Samejima (1969)](#ref-samejima-1969) extended the dichotomous approach to polytomous items with the Graded Response Models (GRM), modeling the probability of an individual responding to a given ordinal category of a test. From this, other approaches to categorical responses were formulated, such as the Model for Nominal Responses ([Bock, 1972](#ref-bock-1972)), the Gradual Scale Model ([Andrich, 1978](#ref-andrich-1978)) and the Partial Credit Model ([Masters, 1982](#ref-masters-1982); [Muraki, 1992](#ref-muraki-1992)).
+
+However, [Samejima (1973)](#ref-samejima-1973) observed a need to incorporate responses on a continuous scale in the estimation of the latent variable by IRT. This is due to the fact that, in psychometric tests, continuous responses can be obtained in two ways. The first is by measuring the time until the completion of a certain activity ([Roskam, 1997](#ref-roskam-1997); [Van der Linden, 2006](#ref-van-der-linden-2006); [Ferrando and Lorenzo-Seva, 2007](#ref-ferrando-2007)). The second way is when tests are answered using visual analogue scales in a straight line segment ([Cella and Perry, 1986](#ref-cella-1986); [Guyatt et al., 1987](#ref-guyatt-1987); [Ferrando, 2001](#ref-ferrando-2001)).
+
+There is a third way to obtain normal continuous responses for measuring a latent trait, which is standardizing continuous indicator variables using the z-score method. In this case, variables that are measured on different scales are placed on the same scale to compare how many standard deviations a specific value is above or below the mean. This type of approach is very common in the construction of synthetic indices ([OCDE, 2008](#ref-ocde-2008)), in which the use of IRT is applicable ([Filmer and Scott, 2012](#ref-filmer-2012); [Vandemoortele, 2014](#ref-vandemoortele-2014)).
+
+In this way, [Samejima (1973)](#ref-samejima-1973) formalized the Continuous Response Model (CRM) for responses limited to the range 0 and 1 and using the normal ogive distribution to model the latent trait. [Wang and Zeng (1998)](#ref-wang-1998) proposed a reparameterization of the Samejima model by applying a logarithmic transformation to continuous responses, still associated with the normal distribution. For the frequentist estimation of item parameters in the CRM, the authors developed a maximum marginal likelihood approach with the aid of the Expectation-Maximization (EM) algorithm ([Dempster et al., 1977](#ref-dempster-1977)).
+
+In many applications, however, the estimation of the latent variable is not the end point of the analysis. The estimated trait can be used as an explanatory variable in regression models to investigate its association with observed responses, denoted by distal outcomes. [Schofield (2008)](#ref-schofield-2008) discusses that cognitive test scores, when used as predictors in regression models, carry measurement error that should not be ignored. However, when treating an estimated latent variable as if it were observed without error, the regression coefficients may become biased, with a tendency to attenuate the effect associated with the predictor measured with error ([Junker et al., 2012](#ref-junker-2012); [Schofield et al., 2015](#ref-schofield-2015)).
+
+The literature on regression with factor scores and latent structure models also points out that stepwise procedures, in which predicted latent scores are subsequently treated as observed, can underestimate structural associations ([Skrondal and Laake, 2001](#ref-skrondal-2001); [Bolck et al., 2004](#ref-bolck-2004); [Devlieger et al., 2016](#ref-devlieger-2016)). Although [Schofield (2008)](#ref-schofield-2008) has emphasized applications in linear regression, the formulation itself based on measurement models and structural models allows extension to generalized linear models, including models for dichotomous responses. In this context, Bayesian approaches are particularly useful because they allow simultaneously estimating the measurement model and the regression model, propagating the uncertainty of the latent variable to the inference about the distal outcome ([Fox and Glas, 2003](#ref-fox-2003); [Junker et al., 2012](#ref-junker-2012)).
+
+Considering that, although there are proposals for modeling continuous responses in the context of IRT, this line of research remains relatively little explored when compared to the vast development of models for categorical data. Furthermore, the use of simultaneous equation models with confirmatory factor analysis as a measurement model is widely used in the literature ([Kline, 1998](#ref-kline-1998)). Despite this, continuous IRT models are perfectly comparable to factor analysis ([Mellenbergh, 1994](#ref-mellenbergh-1994); [Ferrando, 2002](#ref-ferrando-2002)), offering other advantages, such as the interpretation of each item based on discrimination or difficulty parameters, as well as the evaluation of individuals' response patterns ([Ferrando, 1999](#ref-ferrando-1999), [2010](#ref-ferrando-2010)).
+
+Furthermore, there is a predominance of frequentist estimation approaches in the literature, both for categorical models ([Hambleton et al., 1991](#ref-hambleton-1991)) and for the recent developments of continuous models ([Tutz and Jordan, 2024](#ref-tutz-2024)). In contrast, Bayesian formulations offer greater flexibility for modeling the measurement structure, incorporating uncertainty and extending more complex approaches ([Fox, 2010](#ref-fox-2010)).
+
+Therefore, the general objective of this work is to use the latent variable estimated by IRT using continuous items as a predictor in a logistic regression model for a dichotomous distal outcome. Specifically, we seek to compare a two-step approach, in which the CRM is first estimated by maximum marginal likelihood with optimization via the EM algorithm and then the latent variable estimated as observed in logistic regression is treated, with a Bayesian approach of joint estimation of IRT and regression. Through a study with simulated data, the aim is to verify whether the joint Bayesian estimation corrects the underestimation of the effect of the latent variable on the distal response when compared to the two-step approach.
+
+# Methodology {#metodologia}
+
+The proposed model considers a single latent trait $\theta_i$, defined on a continuous scale for each individual $i = 1, 2, \ldots, n$. Furthermore, let $Y_{ij}$ be the indicator variables observed with $j = 1, 2, \ldots, p$, also defined on the continuous scale. In this context, the construct measurement model is defined in which the variations in the indicators are explained by the variation in the latent trait ([Bollen, 1989](#ref-bollen-1989)).
+
+Let $W_i$ be an observed outcome variable, denoted by distal response, whose predictor is not directly observed. In this case, structural regression is defined, where $W_i$ is conditionally modeled on $\theta_i$. Therefore, the Structural Model presented in [Figure 1](#fig-modelo-estrutural) represents the combination of a Measurement Model with the Structural Regression [Kline (1998)](#ref-kline-1998).
+
+<div id="fig-modelo-estrutural" class="figure-title">Figure 1: Path diagram representation of a Structural Model.</div>
+
+```{r figura-1, echo=FALSE, eval=TRUE, out.width="92%"}
+knitr::include_graphics("figures/figure-1-structural-model.png")
+```
+
+<div class="figure-source">Source: author's own creation.</div>
+
+In general terms, the presented structure allows us to evaluate the extent to which individual differences in the latent trait also affect the variation of an exogenous variable observed directly.
+
+## Item Response Theory for Continuous Responses {#tri-respostas-continuas}
+
+The proposed Measurement Model defined by CRM which is based on Samejima's original formulation ([1973](#ref-samejima-1973), [1974](#ref-samejima-1974)). Considering a sample size $n$ and a test with $p$ items, let $Y_{ij}$ be the observed score of the ith individual in the jth item, such that $0 \leq Y_{ij} < k_j$, $\forall i = 1, 2, \ldots, n$, $j = 1, 2, \ldots, p$. Therefore, [Wang and Zeng (1998)](#ref-wang-1998) proposed the following transformation:
+
+$$
+Z_{ij}=\ln\left(\frac{Y_{ij}}{k_j-Y_{ij}}\right)
+\Longleftrightarrow
+Y_{ij}=\frac{k_j\exp\{Z_{ij}\}}{1+\exp\{Z_{ij}\}}. \tag{1}
+$$
+
+Applying the transformation presented in Equation (1) on the original integration function of [Samejima (1973)](#ref-samejima-1973), the probability density function of $Z_{ij}$ is defined by:
+
+$$
+f_Z(z_{ij}\mid\theta_i,a_j,b_j,\alpha_j)=
+\frac{a_j}{\sqrt{2\pi\alpha_j^2}}
+\exp\left\{-\frac{\left[a_j\left(\theta_i-b_j-\frac{z_{ij}}{\alpha_j}\right)\right]^2}{2}\right\}. \tag{2}
+$$
+
+where $\theta_i$ is the latent trait of the ith individual, $\theta_i \in \mathbb{R}$, $\forall i = 1, 2, \ldots, n$. $a_j$, $b_j$ and $\alpha_j$ are the IRT parameters, representing respectively the discrimination, difficulty and scale referring to the j-th item, such as $a_j > 0$, $b_j \in \mathbb{R}$, $\alpha_j > 0$, $\forall j = 1, 2, \ldots, p$. When analyzing the structure of Equation (2), it is easy to see that $Z_{ij}\mid\theta_i,a_j,b_j,\alpha_j$ has the following probability distribution:
+
+$$
+Z_{ij}\mid\theta_i,a_j,b_j,\alpha_j \sim
+N\left(\alpha_j(\theta_i-b_j),\frac{\alpha_j^2}{a_j^2}\right). \tag{3}
+$$
+
+To implement the adjustment of any IRT model for the estimation of a single latent trait, the test must be unidimensional, that is, the observed responses must largely be measuring a single latent variable ([Fox, 2010](#ref-fox-2010)). This assumption can be verified by a correlation analysis between the responses to items two by two. What is desired is that the correlations are all positive and statistically different from zero.
+
+Additionally, item responses need to be independent when conditioned on the latent trait. As seen by [Hambleton et al. (1991)](#ref-hambleton-1991), unidimensionality implies local independence, so checking the first assumption already guarantees that the second is also true. Finally, there is a third assumption that the latent trait is distributed following a standard Normal distribution. Although applied IRT studies are based on this assumption, it is possible to adjust IRT models considering non-normal distributions for the latent trait ([Zhang et al., 2021](#ref-zhang-2021)).
+
+### Interpretation of parameters {#interpretacao-parametros}
+
+The interpretation of CRM parameters can be done using the cumulative characteristic curves. Following the formulation of [Samejima (1969)](#ref-samejima-1969) and its extension for continuous responses ([Samejima, 1973](#ref-samejima-1973)), for a cutoff point $\lambda$, such as $0 < \lambda < k_j$, it is defined:
+
+$$
+z_{j\lambda}=\ln\left(\frac{\lambda}{k_j-\lambda}\right),
+$$
+
+and, from the reparameterization of [Wang and Zeng (1998)](#ref-wang-1998), the cumulative probability of the individual $i$ presenting an answer in item $j$ equal to or greater than $\lambda$ is:
+
+$$
+P(Y_{ij}\geq\lambda\mid\theta_i)=
+\Phi\left[a_j\left(\theta_i-b_j-
+\frac{1}{\alpha_j}\ln\left(\frac{\lambda}{k_j-\lambda}\right)\right)\right].
+$$
+
+The parameter $a_j$ controls the slope of the curves and therefore the item's ability to discriminate. High values ​​of $a_j$ produce steeper transitions between low and high probabilities, more accurately distinguishing individuals with levels close to $\theta$. Reduced values ​​produce flatter curves and noisier responses relative to the latent trait. In normal CRM, the information provided by the item is constant throughout the scale and corresponds to:
+
+$$
+I_j(\theta)=a_j^2.
+$$
+
+Consequently, the total information from a test with $p$ items is additive, so that:
+
+$$
+I(\theta)=\sum_{j=1}^{p}I_j(\theta)=\sum_{j=1}^{p}a_j^2.
+$$
+
+Thus, items with greater discrimination provide more information and reduce the standard error associated with trait estimation. [Figure 2](#fig-crm-discriminacao) illustrates this behavior by keeping $b_j$ and $\alpha_j$ fixed.
+
+```{r curvas-crm-funcoes, eval=TRUE}
+library(ggplot2)
+library(dplyr)
+library(patchwork)
+
+crm_p_ge_lambda = function(theta, lambda, a, b, alpha, k){
+  v = a * (theta - b - (1 / alpha) * log(lambda / (k - lambda)))
+  pnorm(v)
+}
+
+theta = seq(-8, 8, length.out = 500)
+
+k = 5
+
+lambda_values = 1:4
+
+build_crm_data = function(theta, a_values, b_values, alpha_values,
+                            k = 5, lambda_values = 1:4){
+
+  stopifnot(length(a_values) == length(b_values))
+  stopifnot(length(a_values) == length(alpha_values))
+  stopifnot(all(lambda_values > 0))
+  stopifnot(all(lambda_values < k))
+
+  n_items = length(a_values)
+
+  curve_data = expand.grid(
+    theta = theta,
+    item = 1:n_items,
+    lambda = lambda_values
+  ) %>%
+    mutate(
+      a = a_values[item],
+      b = b_values[item],
+      alpha = alpha_values[item],
+
+      P_ge_lambda = crm_p_ge_lambda(
+        theta = theta,
+        lambda = lambda,
+        a = a,
+        b = b,
+        alpha = alpha,
+        k = k
+      ),
+
+      lambda_factor = factor(
+        lambda,
+        levels = lambda_values
+      )
+    )
+
+  return(curve_data)
+}
+
+plot_item_crm = function(i, curve_data){
+
+  df_prob = curve_data %>%
+    filter(item == i)
+
+  a_i = unique(df_prob$a)
+  b_i = unique(df_prob$b)
+  alpha_i = unique(df_prob$alpha)
+  lambda_i = sort(unique(df_prob$lambda))
+
+  ggplot(df_prob, aes(theta, P_ge_lambda, color = lambda_factor)) +
+
+    geom_line(linewidth = 1) +
+
+    coord_cartesian(ylim = c(0, 1)) +
+
+    labs(
+      title = bquote(
+        "Item " ~ .(i) ~ ":  " ~
+          a == .(a_i) ~ "   " ~
+          b == .(b_i) ~ "   " ~
+          alpha == .(alpha_i)
+      ),
+      x = expression(theta),
+      y = expression(P(Y >= lambda ~ "|" ~ theta)),
+      color = expression(lambda)
+    ) +
+
+    scale_color_viridis_d(
+      option = "plasma",
+      direction = -1,
+      labels = parse(text = paste0("lambda == ", lambda_i))
+    ) +
+
+    theme_classic()
+}
+
+plot_crm_scenario = function(scenario_name, a_values, b_values, alpha_values,
+                            theta = theta, k = 5, lambda_values = 1:4){
+
+  curve_data = build_crm_data(
+    theta = theta,
+    a_values = a_values,
+    b_values = b_values,
+    alpha_values = alpha_values,
+    k = k,
+    lambda_values = lambda_values
+  )
+
+  item_plots = lapply(
+    seq_along(a_values),
+    function(i){
+      plot_item_crm(i, curve_data)
+    }
+  )
+
+  item_panel = wrap_plots(
+    item_plots,
+    ncol = 2,
+    guides = "collect"
+  ) +
+    plot_annotation(
+      title = scenario_name
+    ) &
+    theme(
+      legend.position = "right"
+    )
+
+  return(
+    list(
+      data = curve_data,
+      item_panel = item_panel
+    )
+  )
+}
+```
+
+```{r figura-2-discriminacao, eval=TRUE}
+a_values = c(0.5, 1.0, 1.8, 3.0)
+b_values = c(0, 0, 0, 0)
+alpha_values = c(1, 1, 1, 1)
+
+a_scenario = plot_crm_scenario(
+  scenario_name = NULL,
+  a_values = a_values,
+  b_values = b_values,
+  alpha_values = alpha_values,
+  theta = theta,
+  k = k,
+  lambda_values = lambda_values
+)
+```
+
+<div id="fig-crm-discriminacao" class="figure-title">Figure 2: Accumulated CRM characteristic curves for different values ​​of the discrimination parameter $a_j$, maintaining $b_j=0$ and $\alpha_j=1$.</div>
+
+```{r figura-2-discriminacao-grafico, echo=FALSE, eval=TRUE, fig.width=9.5, fig.height=7.2}
+print(a_scenario$item_panel)
+```
+
+<div class="figure-source">Source: author's own creation.</div>
+
+On [Figure 2](#fig-crm-discriminacao), increasing $a_j$ makes curves progressively steeper. Item 1, with $a_j=0{,}5$, presents gradual transitions over a wide range of $\theta$, while item 4, with $a_j=3$, concentrates the probability change in a narrow range. Therefore, higher values ​​of $a_j$ increase the item's ability to distinguish individuals with levels close to the latent trait and, consequently, increase its information.
+
+The parameter $b_j$ determines the horizontal location of the curves and represents the level of the latent trait required for the individual to reach the same cumulative probability. As shown in [Figure 3](#fig-crm-dificuldade), larger values ​​shift all item curves to the right, while smaller values ​​shift them to the left. Because $b_j$ changes the location but not the slope of the curves, it does not modify $I_j(\theta)=a_j^2$.
+
+```{r figura-3-dificuldade, eval=TRUE}
+a_values = c(1.5, 1.5, 1.5, 1.5)
+b_values = c(-2.0, -0.5, 1.0, 2.5)
+alpha_values = c(1, 1, 1, 1)
+
+b_scenario = plot_crm_scenario(
+  scenario_name = NULL,
+  a_values = a_values,
+  b_values = b_values,
+  alpha_values = alpha_values,
+  theta = theta,
+  k = k,
+  lambda_values = lambda_values
+)
+```
+
+<div id="fig-crm-dificuldade" class="figure-title">Figure 3: Accumulated CRM characteristic curves for different values ​​of the difficulty parameter $b_j$, maintaining $a_j=1{,}5$ and $\alpha_j=1$.</div>
+
+```{r figura-3-dificuldade-grafico, echo=FALSE, eval=TRUE, fig.width=9.5, fig.height=7.2}
+print(b_scenario$item_panel)
+```
+
+<div class="figure-source">Source: author's own creation.</div>
+
+In [Figure 3](#fig-crm-dificuldade), the curves maintain the same slope and spacing, but shift horizontally as $b_j$ increases. Item 1, with $b_j=-2$, requires lower levels of $\theta$ to reach a certain cumulative probability; item 4, with $b_j=2{,}5$, requires higher levels. Thus, $b_j$ indicates the location or difficulty of the item on the latent scale, without changing its discrimination or information.
+
+The parameter $\alpha_j$ controls the scale of the transformation between the observed response and the latent trait. In the distribution of Equation (3), the conditional variance is $\alpha_j^2/a_j^2$; in accumulated curves, $\alpha_j$ also regulates the horizontal distance between the cutoff points. Smaller values ​​expand the spacing between the curves associated with different $\lambda$ values, while larger values ​​bring these curves closer together. [Figure 4](#fig-crm-escala) shows that this parameter affects the way in which the continuous scale of responses is discretized into accumulated levels.
+
+```{r figura-4-escala, eval=TRUE}
+a_values = c(1.5, 1.5, 1.5, 1.5)
+b_values = c(0, 0, 0, 0)
+alpha_values = c(0.5, 0.8, 1.5, 3.0)
+
+alpha_scenario = plot_crm_scenario(
+  scenario_name = NULL,
+  a_values = a_values,
+  b_values = b_values,
+  alpha_values = alpha_values,
+  theta = theta,
+  k = k,
+  lambda_values = lambda_values
+)
+```
+
+<div id="fig-crm-escala" class="figure-title">Figure 4: CRM cumulative characteristic curves for different values ​​of the scale parameter $\alpha_j$, maintaining $a_j=1{,}5$ and $b_j=0$.</div>
+
+```{r figura-4-escala-grafico, echo=FALSE, eval=TRUE, fig.width=9.5, fig.height=7.2}
+print(alpha_scenario$item_panel)
+```
+
+<div class="figure-source">Source: author's own creation.</div>
+
+In [Figure 4](#fig-crm-escala), smaller values ​​of $\alpha_j$ produce greater horizontal separation between the curves corresponding to the $\lambda$ cutoff points, as occurs in item 1, with $\alpha_j=0{,}5$. As $\alpha_j$ increases, the curves get closer and transitions between response levels start to occur in a more concentrated region of $\theta$, a behavior more evident in item 4, with $\alpha_j=3$. In this way, $\alpha_j$ controls the spacing between thresholds on the latent trait scale.
+
+The parameters $a_j$ and $\alpha_j$ act together on the shape of the curves. The first mainly controls the slope and item information, while the second controls the spacing between the transformed thresholds. Thus, items with the same location can present very different combinations of precision and separation between response levels. The [Figure 5](#fig-crm-discriminacao-escala) brings together four combinations and allows you to observe this interaction.
+
+```{r figura-5-discriminacao-escala, eval=TRUE}
+a_values = c(1.0, 0.2, 0.2, 2.5)
+b_values = c(0.0, 0.0, 0.0, 0.0)
+alpha_values = c(1.0, 0.2, 2.5, 0.2)
+
+article_scenario = plot_crm_scenario(
+  scenario_name = NULL,
+  a_values = a_values,
+  b_values = b_values,
+  alpha_values = alpha_values,
+  theta = theta,
+  k = k,
+  lambda_values = lambda_values
+)
+```
+
+<div id="fig-crm-discriminacao-escala" class="figure-title">Figure 5: Accumulated CRM characteristic curves for different combinations of discrimination parameters $a_j$ and scale $\alpha_j$, maintaining $b_j=0$.</div>
+
+```{r figura-5-discriminacao-escala-grafico, echo=FALSE, eval=TRUE, fig.width=9.5, fig.height=7.2}
+print(article_scenario$item_panel)
+```
+
+<div class="figure-source">Source: author's own creation.</div>
+
+On the [Figure 5](#fig-crm-discriminacao-escala), the combination of $a_j$ and $\alpha_j$ simultaneously determines the slope and separation of the curves. Item 2 combines low discrimination and low scale parameters, resulting in flat and widely spaced curves; item 3 maintains low discrimination, but the larger $\alpha_j$ brings the thresholds closer. Item 4 associates high discrimination with low $\alpha_j$, producing very steep but separate curves. These patterns show that the parameters perform distinct and complementary functions in characterizing the item.
+
+## Logistic Regression {#regressao-logistica}
+
+Logistic Regression does not directly model the outcome, but rather the conditional probability that the response variable assumes the value 1 (success) given a set of predictors ([Cox and Hinkley, 1979](#ref-cox-1979)). Let $W_i$ be the binary distal response for the ith individual (i.e., $W_i \in \{0,1\}$, $\forall i = 1, 2, \cdots, n$), Equation (4) describes the logit function, which linearizes the relationship between an observed predictor $X$ and the binary outcome:
+
+$$
+\eta_i=\ln\left[\frac{P(W_i=1\mid X_i)}{1-P(W_i=1\mid X_i)}\right]
+=\beta_0+\beta_1X_i. \tag{4}
+$$
+
+Likewise, $q_i$ is defined as:
+
+$$
+q_i=\frac{1}{1+\exp[-(\beta_0+\beta_1X_i)]}. \tag{5}
+$$
+
+Since $q_i$ is a probability (i.e., $0 \geq q_i > 1$, $\forall i = 1, 2, \ldots, n$), then the distribution of $W_i\mid X_i,\beta_0,\beta_1$ is given as:
+
+$$
+W_i\mid X_i,\beta_0,\beta_1 \sim \operatorname{Bern}(q_i). \tag{6}
+$$
+
+## Estimation Methods {#metodos-estimacao}
+
+Considering CRM as a measurement model and logistic regression as structural regression, the estimation process must be capable of estimating the model that is in accordance with the structure presented in [Figure 1](#fig-modelo-estrutural). To this end, the two-step estimation approach and the joint estimation of IRT and regression will be compared.
+
+### Two-Step Estimation {#estimacao-duas-etapas}
+
+In two-step estimation, the CRM is first adjusted to the transformed continuous responses. The conditional independence of the items allows combining their individual contributions and integrating the latent trait, usually assumed as standard normal, to obtain the marginal likelihood of the discrimination, difficulty and scale parameters ([Zhang et al., 2021](#ref-zhang-2021)). As this integration makes direct maximization difficult, the Expectation-Maximization algorithm treats the trace as unobserved data: in the expectation step, it calculates the conditional quantities necessary under the current parameters; in the maximization step, it updates the item parameters. The algebraic breakdown and update rules are presented by [Wang and Zeng (1998)](#ref-wang-1998).
+
+Calibration first estimates the parameters of all items and then the individual traits conditioned by this calibration. To reduce the computational cost of each cycle, [Shojima (2005)](#ref-shojima-2005) proposed a non-iterative solution in normal CRM, with explicit forms in the hope step and closed solutions in the maximization step under vague priors. This approach is implemented in the EstCRM package in R ([Zopluoglu, 2012](#ref-zopluoglu-2012)). The threshold of $10^{-4}$ was considered as a convergence criterion, with a maximum limit of 1000 iterations per EM cycle.
+
+In the second step, the estimated traits are entered as predictors in a conventional logistic regression. The coefficients are obtained by maximum likelihood and, as the problem does not have a closed analytical solution, the R function `glm()` employs iteratively reweighted least squares. At each iteration, the procedure updates the linear predictor and probabilities, constructs a pseudo-observed response and weights dependent on the current probabilities, and solves a weighted least squares problem; updates continue until parameters or log-likelihood stabilize ([Maalouf, 2011](#ref-maalouf-2011)).
+
+This procedure is straightforward, but it treats each estimated latent score as if it were observed without error. [Schofield (2008)](#ref-schofield-2008) shows that the measurement uncertainty that accompanies the trait is not incorporated into the regression and can produce attenuation of the coefficient associated with the latent predictor. In other words, the greater the measurement error, the greater the underestimation of the structural effect ([Junker et al., 2012](#ref-junker-2012); [Schofield et al., 2015](#ref-schofield-2015)). The factor score regression literature documents similar behavior when predicted scores are used as covariates without correction ([Skrondal and Laake, 2001](#ref-skrondal-2001); [Bolck et al., 2004](#ref-bolck-2004); [Devlieger et al., 2016](#ref-devlieger-2016)).
+
+### Joint Estimation {#estimacao-simultanea}
+
+In joint estimation, CRM and logistic regression form a single hierarchical model. The transformed responses inform the item parameters and individual traits, while the binary outcome is directly conditioned on the same latent trait. Thus, the uncertainty about each $\theta_i$ is propagated to the estimation of the regression coefficients, instead of being discarded between two steps ([Fox and Glas, 2003](#ref-fox-2003); [Junker et al., 2012](#ref-junker-2012)).
+
+The inference is Bayesian: the joint posterior distribution conditioned on the observed data combines the likelihood of the measurement model, the likelihood of the outcome and the prior distributions ([Dempster, 1968](#ref-dempster-1968)). Vague normal priors were used for item parameters and regression coefficients, with positive truncation for discrimination and scale, and a standard normal prior for the latent trait. The formulation follows the perspective of estimating IRT models through Bayesian simulation discussed by [Fox (2010)](#ref-fox-2010), [Kim and Bolt (2007)](#ref-kim-2007) and [Patz and Junker (1999)](#ref-patz-1999).
+
+As the posterior distribution does not have a simple analytical form, sampling is done using Monte Carlo Methods via Markov Chains. JAGS implements conditional updates and, when necessary, Metropolis-Hastings mechanisms, building chains whose stationary distribution is the posterior of interest ([Metropolis et al., 1953](#ref-metropolis-1953); [Hastings, 1970](#ref-hastings-1970); [Jackman, 2000](#ref-jackman-2000); [Plummer, 2017](#ref-plummer-2017)). The implementation uses the rjags interface ([Plummer et al., 2025](#ref-plummer-2025)), and chain diagnostics and summaries are supported by the coda package ([Plummer et al., 2006](#ref-plummer-2006)).
+
+## Study with Simulated Data {#estudo-dados-simulados}
+
+To evaluate the behavior of the methods, 1000 replications were generated for each combination of sample size $n \in \{100,250,500,1000\}$ and number of items $p \in \{10,20\}$. The true parameters of the logistic regression were set to $\beta_0=0{,}2$ and $\beta_1=1{,}5$. The detailed exposition below uses the scenario $n=1000$ and $p=10$, present in the R files of the `Classic` and `Joint` approaches, as an example common to both applications. The highest cost blocks are displayed to fully document the procedure, but are not performed in the production of this report; tables and figures are reconstructed only from already saved results.
+
+### True seeds, dimensions and parameters {#sementes-parametros}
+
+The first block fixes 1000 replications, defines the four sample sizes and the two item quantities, and selects the fourth position of `n_values` and the first of `p_values`. The seeds depend on each dimension, so that the generation of item traits and parameters can be reproduced. The strokes follow a normal pattern; discrimination and scale are drawn uniformly between 0.30 and 2.50, and difficulty follows normal pattern.
+
+```{r parametros-verdadeiros}
+r = 1000
+n_values = c(100, 250, 500, 1000)
+p_values = c(10, 20)
+
+true_thetas = list()
+for (i in 1:length(n_values)) {
+  set.seed(228371 + n_values[i])
+  theta = rnorm(n_values[i], mean = 0, sd = 1)
+  true_thetas[[as.character(n_values[i])]] = theta
+}
+
+true_item_parameters = list()
+for (j in 1:length(p_values)) {
+  set.seed(448291 + p_values[j])
+  item.parameters = matrix(NA, p_values[j], 3)
+  colnames(item.parameters) = c("a", "b", "alpha")
+  item.parameters[, 1] = runif(p_values[j], min = 0.30, max = 2.50)
+  item.parameters[, 2] = rnorm(p_values[j], mean = 0, sd = 1)
+  item.parameters[, 3] = runif(p_values[j], min = 0.30, max = 2.50)
+  true_item_parameters[[as.character(p_values[j])]] = item.parameters
+}
+
+n = n_values[4]
+p = p_values[1]
+k = 1
+theta = true_thetas[[as.character(n)]]
+param = true_item_parameters[[as.character(p)]]
+a = param[, 1]
+b = param[, 2]
+alpha = param[, 3]
+```
+
+### Generation of the trace, CRM items and outcome {#geracao-dados}
+
+For each replication, the vector parameters are expanded into $n\times p$ matrices. The conditional mean of each transformed response is `alpha * (theta - b)` and its standard deviation is `alpha / a`, exactly as in Equation (3). After generating `Z`, the inverse logistic transformation produces the continuous responses `Y` in the range $(0,1)$. The recording lines appear commented in the original files; Therefore, this report does not rewrite or replace existing simulated data.
+
+```{r geracao-crm}
+Z = matrix(NA, n, p)
+Y = matrix(NA, n, p)
+
+for (m in 1:r) {
+  set.seed(229182 + m)
+  theta_mat = matrix(theta, n, p)
+  b_mat = matrix(b, n, p, byrow = TRUE)
+  a_mat = matrix(a, n, p, byrow = TRUE)
+  alpha_mat = matrix(alpha, n, p, byrow = TRUE)
+
+  mu = alpha_mat * (theta_mat - b_mat)
+  sd = alpha_mat / a_mat
+  Z = matrix(rnorm(n * p, mean = as.vector(mu),
+                   sd = as.vector(sd)), n, p)
+  Y = k * exp(Z) / (1 + exp(Z))
+  results = Y
+}
+```
+
+The distal outcome uses the same true trait as a predictor. The logit is calculated with the fixed values ​​of $\beta_0$ and $\beta_1$, converted to probability and used in generating a Bernoulli response for each individual and replication. The seed changes with `m`, maintaining distinct and reproducible replications.
+
+```{r geracao-desfecho}
+beta_0 = 0.2
+beta_1 = 1.5
+x = true_thetas[[4]]
+logit = beta_0 + beta_1 * x
+q = 1 / (1 + exp(-logit))
+
+logistic_data = list()
+for (m in 1:r) {
+  set.seed(22913 + m)
+  w = simcausal::rbern(n, q)
+  logistic_data[[as.character(m)]] = w
+}
+```
+
+### Two-step estimation {#aplicacao-duas-etapas}
+
+In the first step, each continuous response matrix is ​​provided to `EstCRMitem`. The argument `type="Shojima"` selects the update proposed by Shojima, `BFGS=TRUE` enables complementary numerical optimization, `converge=0.0001` defines the tolerance and `max.EMCycle=1000` imposes the cycle limit. Estimated parameters are saved per item and replication. Then, `EstCRMperson` calculates the individual scores conditioned on calibration, using the second column of `fit_theta$thetas`.
+
+```{r estimacao-em}
+theta_estimates_EM = matrix(0, n, r)
+a_estimates_EM = matrix(0, p, r)
+b_estimates_EM = matrix(0, p, r)
+alpha_estimates_EM = matrix(0, p, r)
+
+for (m in 1:r) {
+  Y = as.data.frame(read.table(
+    file.path(irt_data_dir, paste0("IRTData_", m, ".txt"))))
+
+  irt_fit = EstCRM::EstCRMitem(
+    Y, max.item = rep(k, p), min.item = rep(0, p),
+    max.EMCycle = 1000, converge = 0.0001,
+    type = "Shojima", BFGS = TRUE
+  )
+
+  a_estimates_EM[, m] = irt_fit$param[, 1]
+  b_estimates_EM[, m] = irt_fit$param[, 2]
+  alpha_estimates_EM[, m] = irt_fit$param[, 3]
+
+  theta_fit = EstCRM::EstCRMperson(
+    Y, ipar = as.matrix(irt_fit$param),
+    max.item = rep(k, p), min.item = rep(0, p)
+  )
+  theta_estimates_EM[, m] = theta_fit$thetas[, 2]
+}
+```
+
+In the second stage, the outcome of each replication is associated with the respective vector of scores estimated by a binomial regression with logit link. The intercept and coefficient of `theta_hat` are stored for later empirical evaluation.
+
+```{r regressao-duas-etapas}
+beta_0_estimates_EM = rep(0, r)
+beta_1_estimates_EM = rep(0, r)
+
+for (m in 1:r) {
+  W = read.table(file.path(
+    regression_data_dir, paste0("LogisticRegressionData_", m, ".txt")))$V1
+  theta_hat = theta_estimates_EM[, m]
+  fit_logit = glm(W ~ theta_hat,
+                  family = binomial(link = "logit"))
+  beta_0_estimates_EM[m] = coef(fit_logit)[1]
+  beta_1_estimates_EM[m] = coef(fit_logit)[2]
+}
+```
+
+### Joint estimation {#aplicacao-simultanea}
+
+The JAGS model reproduces the CRM normal distribution for `Z`, associates `W` directly with the latent trait by a logistic regression, and assigns a standard normal to each `theta`. The priors of `a` and `alpha` are normals truncated at zero; those of `b`, `beta_0` and `beta_1` are normal vacancies. The initial values ​​are the same in the three chains in the original code: discriminations and scales start at 1, and the other parameters at zero.
+
+```{r especificacao-jags}
+model_specification = "
+model {
+  for (i in 1:n) {
+    for (j in 1:p) {
+      Z[i, j] ~ dnorm(alpha[j]*(theta[i] - b[j]), tau[i, j])
+      tau[i, j] <- pow(alpha[j]/a[j], -2)
+    }
+    W[i] ~ dbin((ilogit(beta_0 + beta_1*theta[i])), 1)
+    theta[i] ~ dnorm(0.0, 1.0)
+  }
+  for (j in 1:p) {
+    a[j] ~ dnorm(1.0, 0.001) T(0, )
+    b[j] ~ dnorm(0.0, 0.001)
+    alpha[j] ~ dnorm(1.0, 0.001) T(0, )
+  }
+  beta_0 ~ dnorm(0.0, 1.0E-06)
+  beta_1 ~ dnorm(0.0, 1.0E-06)
+}
+"
+
+writeLines(model_specification, con = "modelsimCRMreglognormal.txt")
+jags.inits = function(chain) {
+  list(a = rep(1, p), b = rep(0, p), alpha = rep(1, p),
+       theta = rep(0, n), beta_0 = 0, beta_1 = 0)
+}
+params.jags = c("a", "b", "alpha", "theta", "beta_0", "beta_1")
+nchains = 3
+```
+
+In each replication, `Y` is reconverted to `Z`, forming with `W`, `n` and `p` the data list. JAGS runs 2000 adaptation iterations, discards another 2000 as burn-in, and retains 4000 per chain, without thinning. The chains are assembled into a matrix; the posterior average of each parameter provides the saved point estimate for that replication.
+
+```{r amostragem-jags}
+for (m in 1:r) {
+  set.seed(99829 + m)
+  Y = read.table(file.path(
+    irt_data_dir, paste0("IRTData_", m, ".txt")))
+  Z = log(Y / (k - Y))
+  W = read.table(file.path(
+    regression_data_dir, paste0("LogisticRegressionData_", m, ".txt")))$V1
+  data_list = list(Z = Z, W = W, n = n, p = p)
+
+  jags_model = rjags::jags.model(
+    file = "modelsimCRMreglognormal.txt",
+    data = data_list,
+    inits = function() jags.inits(chain = 1:nchains),
+    n.chains = nchains, n.adapt = 2000
+  )
+  update(jags_model, n.iter = 2000)
+  samples = coda::coda.samples(
+    model = jags_model, variable.names = params.jags,
+    n.iter = 4000, thin = 1
+  )
+
+  sims_list = as.matrix(samples)
+  theta_estimates_mean[, m] = apply(
+    sims_list[, grep("^theta", colnames(sims_list))], 2, mean)
+  a_estimates_mean[, m] = apply(
+    sims_list[, grep("^a\\[", colnames(sims_list))], 2, mean)
+  b_estimates_mean[, m] = apply(
+    sims_list[, grep("^b\\[", colnames(sims_list))], 2, mean)
+  alpha_estimates_mean[, m] = apply(
+    sims_list[, grep("^alpha\\[", colnames(sims_list))], 2, mean)
+  beta_0_estimates_mean[m] = mean(sims_list[, "beta_0"])
+  beta_1_estimates_mean[m] = mean(sims_list[, "beta_1"])
+}
+```
+
+### Fit check and performance measurements {#verificacao-ajuste}
+
+The code visually checks the mixing and stability of $\beta_1$ via the trace graph and compares densities between chains. In a production run, this reading should be complemented by convergence statistics and effective sample size for all relevant parameters. In the original file, `amostras` is overwritten with each loop pass; consequently, the two graphs below refer only to the last replication processed.
+
+```{r diagnostico-cadeias}
+jags_samples = as.mcmc.list(samples)
+traceplot(samples[, "beta_1"])
+bayesplot::mcmc_dens(jags_samples, pars = "beta_1")
+```
+
+For each parameter, the bias is the difference between the average of the 1000 estimates and the true value. RMSE aggregates the root mean squared errors across replications. The same logic is used for the individual traces and for `a`, `b` and `alpha`; The summaries presented in the following section were calculated from the saved results.
+
+```{r vies-rmse}
+mean_theta_estimate = apply(theta_estimates_EM, 1, mean)
+Bias_theta = mean_theta_estimate - true_thetas[[4]]
+
+MSE_theta = matrix(0, r, n)
+for (m in 1:r) {
+  for (i in 1:n) {
+    MSE_theta[m, i] =
+      (theta_estimates_EM[i, m] - true_thetas[[4]][i])^2
+  }
+}
+RMSE_theta = sqrt(colMeans(MSE_theta))
+
+Bias_a = rowMeans(a_estimates_EM) - true_item_parameters[[1]][, 1]
+Bias_b = rowMeans(b_estimates_EM) - true_item_parameters[[1]][, 2]
+Bias_alpha = rowMeans(alpha_estimates_EM) - true_item_parameters[[1]][, 3]
+RMSE_a = sqrt(rowMeans((a_estimates_EM - true_item_parameters[[1]][, 1])^2))
+RMSE_b = sqrt(rowMeans((b_estimates_EM - true_item_parameters[[1]][, 2])^2))
+RMSE_alpha = sqrt(rowMeans(
+  (alpha_estimates_EM - true_item_parameters[[1]][, 3])^2))
+```
+
+# Numerical Results {#resultados-numericos}
+
+The purpose of the numerical evaluation was to compare the performance of the two-step frequentist estimation and the joint Bayesian estimation as discussed in section 2. [Figure 6](#fig-estimativas-beta1) indicates a different behavior between the two methods throughout the sampling scenarios.
+
+<div id="fig-estimativas-beta1" class="figure-title">Figure 6: Comparison of $\beta_1$ estimates in relation to the true value (dashed line) for each simulated scenario tested.</div>
+
+```{r figura-6, echo=FALSE, eval=TRUE, fig.width=9.4, fig.height=5.8}
+library(ggplot2)
+beta_results = read.csv("../Spreadsheets (EN)/beta_1_estimates.csv",
+                           check.names = FALSE)
+beta_results$n = factor(beta_results$n,
+                           levels = c(100, 250, 500, 1000))
+beta_results$method = factor(
+  beta_results$method,
+  levels = c("Two-stage", "Joint")
+)
+
+ggplot(beta_results,
+       aes(x = n, y = beta_1, fill = method)) +
+  geom_boxplot(width = 0.66, outlier.size = 0.45,
+               position = position_dodge(width = 0.75)) +
+  geom_hline(yintercept = 1.5, linetype = "dashed",
+             linewidth = 0.7) +
+  scale_fill_manual(values = c("#ef8a62", "#67c5c2")) +
+  labs(x = "Sample size (n)",
+       y = expression(hat(beta)[1]), fill = "Method") +
+  theme_bw(base_size = 13) +
+  theme(legend.position = "top",
+        panel.grid.minor = element_blank())
+```
+
+<div class="figure-source">Source: author's own creation.</div>
+
+In smaller sample sizes ($n = 100$ and $n = 250$), the joint Bayesian estimation presents greater dispersion and tends to overestimate $\beta_1$. This result suggests that, in small samples, the joint estimation of item parameters, individual latent traits, and regression parameters may produce additional instability. As the joint model propagates the uncertainty of $\theta$ directly to the structural regression, the estimation of $\beta_1$ depends heavily on the joint identification of the latent scale, the item parameters and the relationship with the outcome.
+
+Interestingly, for these same sample sizes, the estimates of $\beta_1$ by the two-step estimation method are more concentrated around the true value when compared to the joint method. On the other hand, as the sample size increases ($n = 500$ and $n = 1000$), there is a tendency to underestimate the effect of the latent trait on the distal response, which was pointed out in section 1.
+
+On the other hand, for larger samples ($n = 500$ and $n = 1000$), there is a significant improvement in the joint estimation behavior, whose $\beta_1$ estimates are concentrated closer to the true value with a clear reduction in dispersion between replications. This pattern is compatible with the expectation that joint estimation benefits from increased sample information, as larger samples provide more evidence both for identifying the latent trait and for estimating the structural association between $\theta$ and $W$.
+
+Furthermore, [Table 1](#tab-parametros-itens) evaluates the quality of item parameter estimators in both methods tested in the study with simulated data.
+
+Analysis of the [Table 1](#tab-parametros-itens) results concludes that there were no substantial changes in the bias or RMSE of item parameter estimates when both methods are compared. This is an important conclusion, as it allows us to infer that the joint estimation of CRM and regression does not affect the estimation of item parameters. In this way, one of the great advantages of using IRT remains preserved, which is the interpretation of each of the items in a test through their discrimination, difficulty or scale parameters.
+
+<div id="tab-parametros-itens" class="table-title">Table 1: Comparison between two-step and set estimation methods for item parameters in CRM.</div>
+
+```{r tabela-1, echo=FALSE, eval=TRUE, results='asis'}
+table_data = read.csv("../Spreadsheets (EN)/item_parameter_table.csv",
+                  check.names = FALSE)
+cat('<table class="table table-condensed">')
+cat('<thead>')
+cat('<tr><th rowspan="2">n</th><th rowspan="2">Method</th>',
+    '<th colspan="3">Bias</th><th colspan="3">RMSE</th></tr>')
+cat('<tr><th>$\\widehat{a}$</th><th>$\\widehat{b}$</th>',
+    '<th>$\\widehat{\\alpha}$</th><th>$\\widehat{a}$</th>',
+    '<th>$\\widehat{b}$</th><th>$\\widehat{\\alpha}$</th></tr>')
+cat('</thead><tbody>')
+for (i in seq_len(nrow(table_data))) {
+  values = formatC(as.numeric(table_data[i, 3:8]), format = "f", digits = 4)
+  cat('<tr><td>', table_data$n[i], '</td><td>', table_data$method[i], '</td>',
+      paste0('<td>', values, '</td>', collapse = ''), '</tr>', sep = '')
+}
+cat('</tbody></table>')
+```
+
+<div class="figure-source">Source: author's own creation.</div>
+
+Another important point of the analysis is the estimation of the latent trait for all $n$ individuals, given that the latent trait is the predictor of logistic regression and, therefore, essential to explain the behavior of $\widehat{\beta}_1$ observed in [Figure 6](#fig-estimativas-beta1).
+
+<div id="fig-estimativas-theta" class="figure-title">Figure 7: Comparison of the average estimates of the $\theta_i$ in relation to their respective true value for each simulated scenario tested.</div>
+
+```{r figura-7, echo=FALSE, eval=TRUE, fig.width=9.5, fig.height=7.2}
+theta_results = read.csv("../Spreadsheets (EN)/theta_means.csv",
+                            check.names = FALSE)
+theta_results$n = factor(theta_results$n,
+                            levels = c(100, 250, 500, 1000))
+theta_results$method = factor(
+  theta_results$method,
+  levels = c("Two-stage", "Joint")
+)
+
+ggplot(theta_results,
+       aes(x = true_theta, y = mean_theta_estimate)) +
+  geom_abline(intercept = 0, slope = 1, linetype = "dashed",
+              linewidth = 0.55) +
+  geom_point(color = "#24a7b5", alpha = 0.58, size = 0.7) +
+  facet_grid(method ~ n) +
+  coord_equal() +
+  labs(x = expression(theta[i]),
+       y = expression(bar(hat(theta))[i])) +
+  theme_bw(base_size = 12) +
+  theme(panel.grid.minor = element_blank(),
+        strip.background = element_rect(fill = "#eaf0f5"))
+```
+
+<div class="figure-source">Source: author's own creation.</div>
+
+[Figure 7](#fig-estimativas-theta) shows that, in all scenarios, the average of $\widehat{\theta}_i$ aligns very closely with their respective true values. The point cloud follows the identity line, suggesting that both the two-step method and the joint method preserve well the ordering of individuals in the latent trait. On the other hand, the main difference between the methods is not the mean, but the dispersion. In the two-step method, the standard deviation of $\widehat{\theta}_i$ is practically equal to 1 in all simulated sample sizes. However, the standard deviations are smaller: 0.918, 0.957, 0.968 and 0.974, respectively. This suggests a contraction of $\widehat{\theta}_i$ in the joint method, that is, the estimated values ​​tend to be a little more concentrated around zero.
+
+When it comes to how latent trait estimation affects the behavior of $\widehat{\beta}_1$, in smaller scenarios, especially $n = 100$ and $n = 250$, the joint method showed greater dispersion and a tendency to overestimate $\beta_1$. This may be related to the fact that, in these scenarios, the thetas estimated by the joint method are more compressed in relation to the true scale. When the latent variable used in the regression has less variability, the coefficient associated with it can increase to represent the same relationship with the outcome, contributing to higher $\beta_1$ estimates. Additionally, in small samples, the joint estimation of the latent variable, item parameters and regression parameters adds instability, which is reflected in the greater dispersion of the boxplots.
+
+# Conclusion and Future Work {#conclusao-trabalhos-futuros}
+
+The results presented in section 3 demonstrate that, in fact, treating a latent variable as observed results in the underestimation of its effect on another directly measured variable. This can be verified in the analysis of [Figure 6](#fig-estimativas-beta1), especially in larger sample sizes. As a solution, the joint estimation of IRT and regression seems to mitigate the $\widehat{\beta}_1$ bias problem, especially considering large samples. Furthermore, as seen in [Table 1](#tab-parametros-itens), there is no significant loss in the estimation of item parameters in the joint estimation method when compared to the two-step estimation. Therefore, it can be said that asymptotically the joint estimation method presents satisfactory properties and tends to be better than the two-step estimation.
+
+However, some problems still need to be studied in relation to the joint estimation method. Firstly, this approach is more unstable in estimating $\beta_1$ when the sample size is smaller, even pointing out the two-step estimation method as more stable and less biased. Second, the joint estimation using the Bayesian method slightly underestimates the dispersion of the $\theta_i$, especially in smaller sample sizes. This may be a factor that explains excessive overestimation of $\beta_1$ by the ensemble method in small samples. Therefore, improvements for joint estimation must be studied, especially in small samples.
+
+A possible solution is to adopt a system of hierarchical priors for CRM, as already tested in other IRT models ([Kim and Bolt, 2007](#ref-kim-2007); [Natesan et al., 2016](#ref-natesan-2016)). By adopting priors for the mean and precision hyperparameters of the latent trait and item parameters it may be interesting to correct the problem of underestimation or overestimation of extreme $\theta_i$. Therefore, this can reduce the instability of the estimation of $\beta_1$ in joint estimation, which can produce similar results, or even better, than the two-step estimation.
+
+Another aspect to be observed is whether the magnitude of the bias of $\widehat{\beta}_1$ is changed according to the value of $\beta_1$. That is, if the latent trait has a greater effect on the distal response, it may be that the estimates of this effect in the joint method may become more unstable as the true value of $\beta_1$ is greater. Likewise, it may be that the underestimation of $\beta_1$ is also of greater magnitude when estimating the two-step model considering larger $\beta_1$.
+
+Therefore, future work to be proposed includes the joint estimation of CRM and regression using other prior systems, especially hierarchical priors and with different values ​​of $\beta_1$. It is also important to highlight the importance of using more recent statistical tools with better computational power, as is the case with stan ([Gabry et al., 2025](#ref-gabry-2025)). Other issues may be considered in the future, such as the presence of missing data, non-normal distributions, presence of covariates in the IRT, among other aspects.
+
+# References {#referencias}
+
+<div class="references">
+
+<p id="ref-andrich-1978">Andrich, D. (1978). A rating formulation for ordered response categories. Psychometrika, 43(4), 561–573.
+</p>
+
+<p id="ref-birnbaum-1968">Birnbaum, A. (1968). Some latent trait models. Statistical theories of mental test scores.
+</p>
+
+<p id="ref-bock-1972">Bock, R. D. (1972). Estimating item parameters and latent ability when responses are scored in two or more nominal categories. Psychometrika, 37(1), 29–51.
+</p>
+
+<p id="ref-bolck-2004">Bolck, A., Croon, M., and Hagenaars, J. (2004). Estimating latent structure models with categorical variables: One-step versus three-step estimators. Political Analysis, 12(1), 3–27.
+</p>
+
+<p id="ref-bollen-1989">Bollen, K. A. (1989). Structural equations with latent variables. John Wiley & Sons.
+</p>
+
+<p id="ref-cella-1986">Cella, D. F. and Perry, S. W. (1986). Reliability and concurrent validity of three visual-analogue mood scales. Psychological reports, 59(2), 827–833.
+</p>
+
+<p id="ref-cox-1979">Cox, D. R. and Hinkley, D. V. (1979). Theoretical statistics. CRC Press.
+</p>
+
+<p id="ref-dempster-1968">Dempster, A. P. (1968). A generalization of bayesian inference. Journal of the Royal Statistical Society: Series B (Methodological), 30(2), 205–232.
+</p>
+
+<p id="ref-dempster-1977">Dempster, A. P., Laird, N. M., and Rubin, D. B. (1977). Maximum likelihood from incomplete data via the em algorithm. Journal of the royal statistical society: series B (methodological), 39(1), 1–22.
+</p>
+
+<p id="ref-devlieger-2016">Devlieger, I., Mayer, A., and Rosseel, Y. (2016). Hypothesis testing using factor score regression: A comparison of four methods. Educational and Psychological Measurement, 76(5), 741–770.
+</p>
+
+<p id="ref-ferrando-1999">Ferrando, P. J. (1999). Likert scaling using continuous, censored, and graded response models: Effects on criterion-related validity. Applied Psychological Measurement, 23(2), 161–175.
+</p>
+
+<p id="ref-ferrando-2001">Ferrando, P. J. (2001). A nonlinear congeneric model for continuous item responses. British Journal of Mathematical and Statistical Psychology, 54(2), 293–313.
+</p>
+
+<p id="ref-ferrando-2002">Ferrando, P. J. (2002). Theoretical and empirical comparisons between two models for continuous item response. Multivariate Behavioral Research, 37(4), 521–542.
+</p>
+
+<p id="ref-ferrando-2010">Ferrando, P. J. (2010). Some statistics for assessing person-fit based on continuous-response models. Applied Psychological Measurement, 34(4), 219–237.
+</p>
+
+<p id="ref-ferrando-2007">Ferrando, P. J. and Lorenzo-Seva, U. (2007). An item response theory model for incorporating response time data in binary personality items. Applied Psychological Measurement, 31(6), 525–543.
+</p>
+
+<p id="ref-filmer-2012">Filmer, D. and Scott, K. (2012). Assessing asset indices. Demography, 49(1), 359–392.
+</p>
+
+<p id="ref-fox-2010">Fox, J.-P. (2010). Bayesian item response modeling: Theory and applications. Springer.
+</p>
+
+<p id="ref-fox-2003">Fox, J.-P. and Glas, C. A. W. (2003). Bayesian modeling of measurement error in predictor variables using item response theory. Psychometrika, 68(2), 169–191.
+</p>
+
+<p id="ref-gabry-2025">Gabry, J., Češnovar, R., Johnson, A., and Bronder, S. (2025). cmdstanr: R Interface to 'CmdStan'. R package version 0.9.0, https://discourse.mc-stan.org.
+</p>
+
+<p id="ref-guyatt-1987">Guyatt, G. H., Townsend, M., Berman, L. B., and Keller, J. L. (1987). A comparison of likert and visual analogue scales for measuring change in function. Journal of chronic diseases, 40(12), 1129–1133.
+</p>
+
+<p id="ref-hambleton-1991">Hambleton, R. K., Swaminathan, H., and Rogers, H. J. (1991). Fundamentals of item response theory, volume 2. Sage.
+</p>
+
+<p id="ref-hare-2018">Hare, C. and Poole, K. T. (2018). Psychometric methods in political science. The Wiley Handbook of Psychometric Testing: A Multidisciplinary Reference on Survey, Scale and Test Development, pages 901–931.
+</p>
+
+<p id="ref-hastings-1970">Hastings, W. K. (1970). Monte carlo sampling methods using markov chains and their applications.
+</p>
+
+<p id="ref-hays-2007">Hays, R. D., Liu, H., Spritzer, K., and Cella, D. (2007). Item response theory analyses of physical functioning items in the medical outcomes study. Medical care, 45(5), S32–S38.
+</p>
+
+<p id="ref-jackman-2000">Jackman, S. (2000). Estimation and inference via bayesian simulation: An introduction to markov chain monte carlo. American journal of political science, pages 375–404.
+</p>
+
+<p id="ref-junker-2012">Junker, B., Schofield, L. S., and Taylor, L. J. (2012). The use of cognitive ability measures as explanatory variables in regression analysis. IZA Journal of Labor Economics, 1(1), 4.
+</p>
+
+<p id="ref-kim-2007">Kim, J.-S. and Bolt, D. M. (2007). Estimating item response theory models using markov chain monte carlo methods. Educational Measurement: Issues and Practice, 26(4), 38–51.
+</p>
+
+<p id="ref-kline-1998">Kline, R. B. (1998). Structural equation modeling. New York: Guilford, 33, 9780203108550–9.
+</p>
+
+<p id="ref-knoll-2012">Knoll, M. A. and Houts, C. R. (2012). The financial knowledge scale: An application of item response theory to the assessment of financial literacy. Journal of consumer affairs, 46(3), 381–410.
+</p>
+
+<p id="ref-lord-1952">Lord, F. (1952). A theory of test scores. Psychometric monographs.
+</p>
+
+<p id="ref-maalouf-2011">Maalouf, M. (2011). Logistic regression in data analysis: an overview. International Journal of Data Analysis Techniques and Strategies, 3(3), 281–299.
+</p>
+
+<p id="ref-masters-1982">Masters, G. N. (1982). A rasch model for partial credit scoring. Psychometrika, 47(2), 149–174.
+</p>
+
+<p id="ref-mellenbergh-1994">Mellenbergh, G. J. (1994). A unidimensional latent trait model for continuous item responses. Multivariate Behavioral Research, 29(3), 223–236.
+</p>
+
+<p id="ref-metropolis-1953">Metropolis, N., Rosenbluth, A. W., Rosenbluth, M. N., Teller, A. H., and Teller, E. (1953). Equation of state calculations by fast computing machines. The journal of chemical physics, 21(6), 1087–1092.
+</p>
+
+<p id="ref-muraki-1992">Muraki, E. (1992). A generalized partial credit model: Application of an em algorithm. ETS Research Report Series, 1992(1), i–30.
+</p>
+
+<p id="ref-natesan-2016">Natesan, P., Nandakumar, R., Minka, T., and Rubright, J. D. (2016). Bayesian prior choice in irt estimation using mcmc and variational bayes. Frontiers in psychology, 7, 1422.
+</p>
+
+<p id="ref-ocde-2008">OCDE, O. (2008). Handbook on constructing composite indicators: Methodology and user guide. European Commission.
+</p>
+
+<p id="ref-patz-1999">Patz, R. J. and Junker, B. W. (1999). A straightforward approach to markov chain monte carlo methods for item response models. Journal of educational and behavioral Statistics, 24(2), 146–178.
+</p>
+
+<p id="ref-plummer-2017">Plummer, M. (2017). Jags version 4.3. 0 user manual.
+</p>
+
+<p id="ref-plummer-2006">Plummer, M., Best, N., Cowles, K., Vines, K., et al. (2006). Coda: convergence diagnosis and output analysis for mcmc. R news, 6(1), 7–11.
+</p>
+
+<p id="ref-plummer-2025">Plummer, M., Stukalov, A., and Denwood, M. (2025). rjags: Bayesian Graphical Models using MCMC. CRAN, Vienna, Austria. R package version 4-17.
+</p>
+
+<p id="ref-rasch-1960">Rasch, G. (1960). Probabilistic Models for Some Intelligence and Attainment Tests. Danish Institute for Educational Research, Copenhagen.
+</p>
+
+<p id="ref-roskam-1997">Roskam, E. E. (1997). Models for speed and time-limit tests. In Handbook of modern item response theory, pages 187–208. Springer.
+</p>
+
+<p id="ref-samejima-1969">Samejima, F. (1969). Estimation of latent ability using a response pattern of graded scores. Psychometrika, 34(S1), 1–97.
+</p>
+
+<p id="ref-samejima-1973">Samejima, F. (1973). Homogeneous case of the continuous response model. Psychometrika, 38(2), 203–219.
+</p>
+
+<p id="ref-samejima-1974">Samejima, F. (1974). Normal ogive model on the continuous response level in the multidimensional latent space. Psychometrika, 39(1), 111–121.
+</p>
+
+<p id="ref-schofield-2008">Schofield, L. S. (2008). Modeling measurement error when using cognitive test scores in social science research. Ph.D. thesis, Carnegie Mellon University, Pittsburgh, Pennsylvania.
+</p>
+
+<p id="ref-schofield-2015">Schofield, L. S., Junker, B., Taylor, L. J., and Black, D. A. (2015). Predictive inference using latent variables with covariates. Psychometrika, 80(3), 727–747.
+</p>
+
+<p id="ref-shojima-2005">Shojima, K. (2005). A noniterative item parameter solution in each em cycle of the continuous response model. Educational technology research, 28(1-2), 11–22.
+</p>
+
+<p id="ref-skrondal-2001">Skrondal, A. and Laake, P. (2001). Regression among factor scores. Psychometrika, 66(4), 563–575.
+</p>
+
+<p id="ref-spearman-1904">Spearman, C. (1904). 'general intelligence,' objectively determined and measured. The American Journal of Psychology, 15(2), 201–293.
+</p>
+
+<p id="ref-tutz-2024">Tutz, G. and Jordan, P. (2024). Latent trait item response models for continuous responses. Journal of Educational and Behavioral Statistics, 49(4), 499–532.
+</p>
+
+<p id="ref-van-der-linden-2006">Van der Linden, W. J. (2006). A lognormal model for response times on test items. Journal of Educational and Behavioral Statistics, 31(2), 181–204.
+</p>
+
+<p id="ref-vandemoortele-2014">Vandemoortele, M. (2014). Measuring household wealth with latent trait modelling: An application to malawian dhs data. Social Indicators Research, 118(2), 877–891.
+</p>
+
+<p id="ref-wang-1998">Wang, T. and Zeng, L. (1998). Item parameter estimation for a continuous response model using an em algorithm. Applied Psychological Measurement, 22(4), 333–344.
+</p>
+
+<p id="ref-zhang-2021">Zhang, X., Wang, C., Weiss, D. J., and Tao, J. (2021). Bayesian inference for irt models with non-normal latent trait distributions. Multivariate Behavioral Research, 56(5), 703–723.
+</p>
+
+<p id="ref-zopluoglu-2012">Zopluoglu, C. (2012). Estcrm: An r package for samejima’s continuous irt model. Applied Psychological Measurement, 36(2), 149.
+</p>
+
+</div>
+
+<section class="ai-declaration" aria-labelledby="declaracao-uso-ia">
+<h1 id="declaracao-uso-ia">Declaration on the use of artificial intelligence</h1>
+
+<p>During the preparation of this work, OpenAI's ChatGPT/Codex, using the GPT-5 model, was used to support code structuring, consistency review, report formatting, the visual organization of tables and figures, rendering automation, and translation of the report into English. The scientific content, construction of the statistical model, interpretation of results, validation of estimates, and final responsibility for the work belong to the author. The artificial intelligence tool was not used as an author, did not replace the author's critical analysis, and does not alter human responsibility for the integrity, accuracy, and presentation of the information.</p>
+</section>

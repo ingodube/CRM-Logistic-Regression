@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html$if(lang)$ lang="$lang$" xml:lang="$lang$"$endif$>
+<head>
+<meta charset="utf-8">
+<meta name="generator" content="pandoc">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+$if(english-current)$
+<link rel="canonical" href="https://ingodube.github.io/CRM-Logistic-Regression/metodologia.html">
+$else$
+<link rel="canonical" href="https://ingodube.github.io/CRM-Logistic-Regression/methodology-pt-br.html">
+$endif$
+<link rel="alternate" hreflang="en" href="https://ingodube.github.io/CRM-Logistic-Regression/metodologia.html">
+<link rel="alternate" hreflang="pt-BR" href="https://ingodube.github.io/CRM-Logistic-Regression/methodology-pt-br.html">
+<link rel="alternate" hreflang="x-default" href="https://ingodube.github.io/CRM-Logistic-Regression/metodologia.html">
+$for(author-meta)$
+<meta name="author" content="$author-meta$">
+$endfor$
+<title>$if(title-prefix)$$title-prefix$ – $endif$$pagetitle$</title>
+$for(header-includes)$
+$header-includes$
+$endfor$
+<style>
+code { white-space: pre-wrap; }
+span.smallcaps { font-variant: small-caps; }
+div.hanging-indent { margin-left: 1.5em; text-indent: -1.5em; }
+ul.task-list { list-style: none; }
+.display.math { display: block; margin: 0.8rem auto; text-align: center; }
+</style>
+$if(highlighting-css)$
+<style data-origin="pandoc">
+$highlighting-css$
+</style>
+$endif$
+$for(css)$
+<link rel="stylesheet" href="$css$">
+$endfor$
+</head>
+<body>
+<main class="report-page">
+<nav class="language-bar" aria-label="$language-label$">
+<details class="language-switcher">
+<summary><span>$language-label$</span><span class="language-current">$language-current$</span></summary>
+<ul>
+<li><a href="$english-url$" lang="en" hreflang="en"$if(english-current)$ aria-current="page"$endif$>English (EN)</a></li>
+<li><a href="$portuguese-url$" lang="pt-BR" hreflang="pt-BR"$if(portuguese-current)$ aria-current="page"$endif$>Português (PT-BR)</a></li>
+</ul>
+</details>
+</nav>
+<header class="report-header">
+$if(title)$
+<h1 class="title">$title$</h1>
+$endif$
+<div class="report-meta">
+$for(author)$
+<p class="author"><strong>$author$</strong></p>
+$endfor$
+$if(affiliation)$
+<p>$affiliation$</p>
+$endif$
+$if(secondary-affiliation)$
+<p>$secondary-affiliation$</p>
+$endif$
+$if(email)$
+<p class="email">$email$</p>
+$endif$
+$if(keywords)$
+<p class="keywords"><strong>$keywords-label$:</strong> $keywords$</p>
+$endif$
+</div>
+</header>
+$if(toc)$
+<details class="report-toc" open>
+<summary>$toc-label$</summary>
+<nav id="TOC" role="doc-toc">
+$toc$
+</nav>
+</details>
+$endif$
+<article class="report-content">
+$for(include-before)$
+$include-before$
+$endfor$
+$body$
+$for(include-after)$
+$include-after$
+$endfor$
+</article>
+</main>
+</body>
+</html>
