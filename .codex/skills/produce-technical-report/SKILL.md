@@ -11,8 +11,8 @@ description: Produce, revise, render, validate, and publish the bilingual R Mark
 2. Edit the R Markdown sources; never edit only the rendered HTML.
 3. Treat `technical_report_pt_br.Rmd` and `Technical Report Source (PT-BR).pdf` as the protected Portuguese source pair. Only the authorized AI declaration and operational path references may differ after normalization.
 4. Keep English as the default at `docs/metodologia.html`, PT-BR at `docs/methodology-pt-br.html`, and redirect `docs/index.html` to English.
-5. Preserve `Simulated Data/`, saved replication matrices, formulas, citations, semantic IDs, and all analytical values.
-6. Keep complete simulation and estimation chunks visible but disabled by default with `eval=FALSE`. Execute only lightweight tables and figures from saved results.
+5. Preserve the localized spreadsheet artifacts, formulas, citations, semantic IDs, and all analytical values used by the report.
+6. Keep complete simulation and estimation chunks visible but disabled by default with `eval=FALSE`. Execute only lightweight tables and figures from `Spreadsheets (EN)/` and `Spreadsheets (PT-BR)/`.
 7. Keep the language dropdown, `lang`, canonical URLs, `hreflang`, `aria-current`, keyboard focus, and responsive behavior valid in both pages.
 8. Run, from the repository root:
 
@@ -33,7 +33,8 @@ git diff --check
 
 - Use American English in the EN source and Brazilian Portuguese in the PT-BR source.
 - Put figure and table titles above their elements.
-- Keep the white reading surface, dark outer background, orange accent, 46-rem reading width, collapsible contents, and responsive layout.
+- Match all aesthetic parameters in `technical-report.css` to the PNS methodological report: white reading surface, dark outer background, orange accent, 46-rem reading width, collapsible contents, typography, spacing, tables, code blocks, and responsive breakpoints.
+- Keep `div.sourceCode` non-scrolling and use its `pre` element as the single scroll container so a long code block retains its gray background throughout.
 - Keep display equations centered without individual scrollbars.
 - Keep references justified with the final line aligned left.
 - State that AI supported code structure, consistency review, formatting, rendering automation, and English translation; retain human responsibility for all scientific content.
@@ -41,5 +42,5 @@ git diff --check
 ## Localization parity
 
 - The two report sources must share citations, references, semantic IDs, equations, chunk IDs, figures, tables, links, and numeric values.
-- Translate displayed code identifiers, messages, labels, and paths without changing package APIs, statistical expressions, or required input literals.
-- Rebuild localized artifacts deterministically and retain their parity checks.
+- Translate displayed code identifiers, messages, labels, and spreadsheet paths without changing package APIs, statistical expressions, or required input literals.
+- Rebuild localized CSV and report artifacts deterministically and retain their parity checks.

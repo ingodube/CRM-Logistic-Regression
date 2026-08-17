@@ -20,8 +20,8 @@ CACHE = ROOT / "tools" / "translation-cache.json"
 ENGLISH_YAML = """---
 title: "Incorporating Measurement Error from Item Response Theory for Continuous Responses into Dichotomous Distal Outcomes: A Bayesian Approach"
 author: "Ingo Dube Souza"
-affiliation: "Graduate Program in Statistics and Data Science (PGECD/UFBA)"
-secondary-affiliation: "Economic Studies (SENAI/CIMATEC)"
+affiliation: "MSc Program in Statistics and Data Science (PGECD/UFBA)"
+secondary-affiliation: "Department of Industrial Economics (SENAI/CIMATEC)"
 email: "ingo.dube@ufba.br"
 keywords: "IRT; Regression; Distal Outcome; MCMC; EM Algorithm."
 lang: en

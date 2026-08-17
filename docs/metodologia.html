@@ -8,6 +8,7 @@
 <link rel="alternate" hreflang="en" href="https://ingodube.github.io/CRM-Logistic-Regression/metodologia.html">
 <link rel="alternate" hreflang="pt-BR" href="https://ingodube.github.io/CRM-Logistic-Regression/methodology-pt-br.html">
 <link rel="alternate" hreflang="x-default" href="https://ingodube.github.io/CRM-Logistic-Regression/metodologia.html">
+<link href="data:," rel="icon">
 <meta name="author" content="Ingo Dube Souza">
 <title>Incorporating Measurement Error from Item Response Theory for Continuous Responses into Dichotomous Distal Outcomes: A Bayesian Approach</title>
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
@@ -105,11 +106,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; }
 --code-bg: #f5f5f3;
 --paper: #ffffff;
 }
-* {
-box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 html {
 background: #050505;
+max-width: 100%;
+overflow-x: clip;
 scroll-behavior: smooth;
 }
 body {
@@ -119,79 +120,77 @@ font-family: Georgia, "Times New Roman", serif;
 font-size: 17px;
 line-height: 1.64;
 margin: 0;
+max-width: 100%;
+overflow-x: clip;
 }
 .report-page {
 background: var(--paper);
 margin: 0 auto;
 max-width: 78rem;
 min-height: 100vh;
+min-width: 0;
 padding: 4rem 5rem 6rem;
-}
-.language-bar {
-display: flex;
-justify-content: flex-end;
-margin: 0 auto 1.6rem;
-max-width: 68rem;
-position: relative;
-z-index: 10;
-}
-.language-switcher {
-font-family: Arial, Helvetica, sans-serif;
-font-size: 0.78rem;
-position: relative;
-}
-.language-switcher summary {
-align-items: center;
-border: 1px solid var(--rule);
-cursor: pointer;
-display: flex;
-font-weight: 700;
-gap: 0.75rem;
-list-style: none;
-min-width: 9.5rem;
-padding: 0.5rem 0.7rem;
-text-transform: uppercase;
-}
-.language-switcher summary::-webkit-details-marker {
-display: none;
-}
-.language-switcher summary::after {
-color: var(--accent);
-content: "▾";
-margin-left: auto;
-}
-.language-current {
-color: var(--accent-dark);
-}
-.language-switcher ul {
-background: var(--paper);
-border: 1px solid var(--rule);
-box-shadow: 0 0.45rem 1rem rgb(0 0 0 / 12%);
-list-style: none;
-margin: 0.25rem 0 0;
-min-width: 13rem;
-padding: 0.3rem;
-position: absolute;
-right: 0;
-}
-.language-switcher li {
-margin: 0;
-}
-.language-switcher a {
-display: block;
-padding: 0.55rem 0.65rem;
-text-decoration: none;
-}
-.language-switcher a[aria-current="page"] {
-background: #fff3eb;
-color: var(--ink);
-font-weight: 700;
+width: 100%;
 }
 .report-header,
-.report-toc {
+.report-toc,
+.language-bar {
 margin-left: auto;
 margin-right: auto;
 max-width: 68rem;
+min-width: 0;
+}
+.language-bar {
+display: flex;
+font-family: Arial, Helvetica, sans-serif;
+justify-content: flex-end;
+margin-bottom: 1rem;
+position: relative;
+z-index: 10;
+}
+.language-switcher { position: relative; }
+.language-switcher summary {
+border-bottom: 1px solid var(--rule);
+color: var(--ink);
+cursor: pointer;
+display: flex;
+font-size: 0.76rem;
+font-weight: 700;
+gap: 0.6rem;
+letter-spacing: 0.055em;
+list-style: none;
+padding: 0.35rem 0;
+text-transform: uppercase;
+}
+.language-switcher summary::-webkit-details-marker { display: none; }
+.language-switcher summary::after { color: var(--accent); content: "▾"; }
+.language-switcher[open] summary::after { content: "▴"; }
+.language-current { color: var(--accent-dark); }
+.language-switcher ul {
+background: var(--paper);
+border: 1px solid var(--rule);
+list-style: none;
+margin: 0.35rem 0 0;
+min-width: 12.5rem;
+padding: 0.35rem 0;
+position: absolute;
+right: 0;
+top: 100%;
+}
+.language-switcher li { margin: 0; text-align: left; }
+.language-switcher a {
+color: var(--ink);
+display: block;
+font-size: 0.82rem;
+padding: 0.5rem 0.75rem;
+text-decoration: none;
+white-space: nowrap;
+}
+.language-switcher a:hover,
+.language-switcher a:focus-visible,
+.language-switcher a[aria-current="page"] {
+background: #fff3eb;
+color: var(--accent-dark);
 }
 .report-header {
 border-bottom: 3px solid var(--accent);
@@ -206,6 +205,7 @@ letter-spacing: -0.045em;
 line-height: 1.03;
 margin: 0 0 1.6rem;
 max-width: 64rem;
+overflow-wrap: anywhere;
 text-align: left;
 }
 .report-meta {
@@ -218,23 +218,19 @@ line-height: 1.48;
 margin: 0.12rem 0;
 text-align: left;
 }
-.report-meta .author {
-color: var(--ink);
-font-size: 1rem;
-margin-bottom: 0.25rem;
-}
-.report-meta .keywords {
-margin-top: 0.65rem;
-}
+.author-block + .author-block { margin-top: 0.8rem; }
+.report-meta .author { color: var(--ink); font-size: 1rem; margin-bottom: 0.25rem; }
+.report-meta .report-type { color: var(--ink); font-weight: 700; margin-top: 0.75rem; }
+.report-meta .report-subtitle { max-width: 64rem; }
+.report-meta .keywords { margin-top: 0.65rem; }
 a {
 color: var(--accent-dark);
+overflow-wrap: anywhere;
 text-decoration-color: color-mix(in srgb, var(--accent) 55%, transparent);
 text-underline-offset: 0.14em;
 }
 a:hover,
-a:focus-visible {
-color: var(--accent);
-}
+a:focus-visible { color: var(--accent); }
 .report-toc {
 border-bottom: 1px solid var(--rule);
 margin-top: 1.5rem;
@@ -250,9 +246,7 @@ letter-spacing: 0.09em;
 list-style-position: inside;
 text-transform: uppercase;
 }
-.report-toc summary::marker {
-color: var(--accent);
-}
+.report-toc summary::marker { color: var(--accent); }
 #TOC > ul {
 column-count: 2;
 column-gap: 3rem;
@@ -264,26 +258,18 @@ font-family: Arial, Helvetica, sans-serif;
 font-size: 0.83rem;
 line-height: 1.45;
 }
-#TOC li {
-break-inside: avoid;
-margin: 0.28rem 0;
-}
-#TOC ul ul {
-margin: 0.25rem 0 0.55rem;
-padding-left: 1.1rem;
-}
-#TOC a {
-color: var(--ink);
-text-decoration: none;
-}
-#TOC a:hover,
-#TOC a:focus-visible {
-color: var(--accent-dark);
-}
+#TOC li { break-inside: avoid; margin: 0.28rem 0; text-align: left; }
+#TOC ul ul { margin: 0.25rem 0 0.55rem; padding-left: 1.1rem; }
+#TOC a { color: var(--ink); text-decoration: none; }
+#TOC a:hover, #TOC a:focus-visible { color: var(--accent-dark); }
 .report-content {
 margin: 3.4rem auto 0;
 max-width: 46rem;
+min-width: 0;
 }
+.report-content,
+.report-content > *,
+.report-content section { max-width: 100%; min-width: 0; }
 .report-content h1,
 .report-content h2,
 .report-content h3,
@@ -293,6 +279,7 @@ font-family: Arial, Helvetica, sans-serif;
 font-weight: 700;
 letter-spacing: -0.018em;
 line-height: 1.2;
+overflow-wrap: anywhere;
 scroll-margin-top: 1rem;
 }
 .report-content h1 {
@@ -301,30 +288,19 @@ font-size: 1.8rem;
 margin: 4rem 0 1.35rem;
 padding-top: 1.15rem;
 }
-.report-content h1:first-child {
-border-top: 0;
-margin-top: 0;
-padding-top: 0;
-}
-.report-content h2 {
-font-size: 1.35rem;
-margin: 2.8rem 0 1rem;
-}
-.report-content h3 {
-font-size: 1.08rem;
-margin: 2.15rem 0 0.8rem;
-}
-.report-content h4 {
-font-size: 0.98rem;
-margin: 1.8rem 0 0.65rem;
-}
-.report-content p {
-hyphens: auto;
-margin: 0 0 1rem;
-text-align: justify;
-}
+.report-content h1:first-child { border-top: 0; margin-top: 0; padding-top: 0; }
+.report-content h2 { font-size: 1.35rem; margin: 2.8rem 0 1rem; }
+.report-content h3 { font-size: 1.08rem; margin: 2.15rem 0 0.8rem; }
+.report-content h4 { font-size: 0.98rem; margin: 1.8rem 0 0.65rem; }
+.report-content p { hyphens: auto; margin: 0 0 1rem; text-align: justify; }
+.report-content li { text-align: left; }
+.method-note { margin: 1.35rem 0; }
+.method-note strong { font-family: Arial, Helvetica, sans-serif; }
+.method-note strong::after { content: "."; }
 .figure-title,
-.table-title {
+.table-title,
+table caption {
+caption-side: top;
 color: var(--muted);
 font-family: Arial, Helvetica, sans-serif;
 font-size: 0.78rem;
@@ -335,30 +311,28 @@ text-align: center;
 }
 .figure-source,
 .figure-source p,
-.figure-container,
-.figure-container p {
+.source-note,
+.source-after-note,
+.table-source,
+.table-note,
+.figure-note {
 color: var(--muted);
 font-family: Arial, Helvetica, sans-serif;
 font-size: 0.78rem;
-text-align: center;
-}
-.figure-source {
+line-height: 1.45;
 margin: 0.2rem 0 1.4rem;
+hyphens: auto;
+text-align: justify;
+text-align-last: left;
 }
-img {
-display: block;
-height: auto;
-margin: 0 auto;
-max-width: 100%;
-}
+img, svg, canvas { display: block; height: auto; margin: 0 auto; max-width: 100%; }
 .math.display,
-math[display="block"] {
-margin: 1.25rem auto;
-overflow: visible;
-text-align: center;
-}
+math[display="block"] { margin: 1.25rem auto; max-width: 100%; overflow: visible; text-align: center; }
 div.sourceCode {
 margin: 1.3rem 0 1.65rem;
+max-width: 100%;
+min-width: 0;
+overflow: visible;
 }
 pre {
 background: var(--code-bg);
@@ -370,152 +344,78 @@ font-size: 0.76rem;
 line-height: 1.48;
 margin: 0;
 max-height: 42rem;
+max-width: 100%;
 overflow: auto;
 padding: 1rem 1.1rem;
 }
-code {
-font-family: Consolas, "Liberation Mono", "Courier New", monospace;
-}
+pre.sourceCode { overflow: auto; }
+code { font-family: Consolas, "Liberation Mono", "Courier New", monospace; }
 :not(pre) > code {
 background: var(--code-bg);
 border-radius: 2px;
 font-size: 0.86em;
+overflow-wrap: anywhere;
 padding: 0.08em 0.25em;
+white-space: normal;
+word-break: break-word;
 }
-.table-title + .sourceCode,
-.table-title + div {
-margin-top: 0.5rem;
-}
+.table-scroll { margin: 1rem 0 2rem; max-width: 100%; overflow-x: auto; }
 table {
 border-collapse: collapse;
 display: table;
 font-family: Arial, Helvetica, sans-serif;
 font-size: 0.78rem;
 line-height: 1.35;
-margin: 1rem auto 2rem;
+margin: 0;
+min-width: 100%;
 width: 100%;
 }
-thead {
-border-bottom: 2px solid var(--ink);
-border-top: 1px solid var(--ink);
-}
-tbody tr {
-border-bottom: 1px solid var(--rule);
-}
-th,
-td {
-background: transparent;
-border: 0;
-padding: 0.52rem 0.48rem;
-}
-th {
-font-weight: 700;
-text-align: center;
-}
-td {
-text-align: right;
-}
-td:first-child,
-td:nth-child(2) {
-text-align: left;
-}
-.references {
-text-align: justify;
-}
-.references p {
-font-size: 0.93rem;
-margin-bottom: 0.85rem;
-text-align: justify;
-text-align-last: left;
-}
-.references p[id^="ref-"] {
-scroll-margin-top: 1rem;
-}
+table caption { margin-top: 0; }
+thead { border-bottom: 2px solid var(--ink); border-top: 1px solid var(--ink); }
+tbody tr { border-bottom: 1px solid var(--rule); }
+th, td { background: transparent; border: 0; padding: 0.52rem 0.48rem; text-align: center; vertical-align: top; }
+th { font-weight: 700; }
+th:first-child, td:first-child { text-align: left; }
+.references { text-align: justify; }
+.references p { font-size: 0.93rem; margin-bottom: 0.85rem; text-align: justify; text-align-last: left; }
+.references p[id^="ref-"] { scroll-margin-top: 1rem; }
 .report-content h1:target,
 .report-content h2:target,
 .report-content h3:target,
 .figure-title:target,
 .table-title:target,
+caption:target,
 .references p:target {
 background: #fff3eb;
 border-radius: 0.15rem;
 box-shadow: 0 0 0 0.42rem #fff3eb;
 }
-.figure-title,
-.table-title {
-scroll-margin-top: 1rem;
-}
+.figure-title, .table-title, table caption { scroll-margin-top: 1rem; }
 @media (max-width: 960px) {
-.report-page {
-padding: 3rem 2.1rem 5rem;
-}
-#TOC > ul {
-column-count: 1;
-}
+.report-page { padding: 3rem 2.1rem 5rem; }
+#TOC > ul { column-count: 1; }
 }
 @media (max-width: 640px) {
-body {
-font-size: 16px;
-}
-.report-page {
-padding: 2rem 0.9rem 4rem;
-}
-.language-bar {
-margin-bottom: 1.2rem;
-}
-h1.title {
-font-size: 2.15rem;
-}
-.report-content {
-margin-top: 2.5rem;
-}
-.report-content h1 {
-font-size: 1.55rem;
-}
-pre {
-font-size: 0.7rem;
-white-space: pre-wrap;
-}
-pre > code.sourceCode,
-pre > code.sourceCode > span {
-max-width: 100%;
-overflow-wrap: anywhere;
-white-space: pre-wrap;
-}
-pre > code.sourceCode > span {
-display: block;
-}
-math[display="block"] {
-font-size: 0.84em;
-max-width: 100%;
-}
-table {
-display: block;
-overflow-x: auto;
-white-space: nowrap;
-}
+body { font-size: 16px; }
+.report-page { padding: 2rem 0.9rem 4rem; }
+h1.title { font-size: 2.15rem; }
+.report-content { margin-top: 2.5rem; }
+.report-content h1 { font-size: 1.55rem; }
+.report-content p { hyphens: none; }
+pre { font-size: 0.7rem; white-space: pre-wrap; }
+.references p { overflow-wrap: anywhere; }
 }
 @media print {
-html,
-body {
-background: #fff;
-}
-.report-page {
-max-width: none;
-padding: 0;
-}
-.report-toc {
-break-after: page;
-}
+html, body { background: #fff; overflow: visible; }
+.report-page { max-width: none; padding: 0; }
+.report-toc { break-after: page; }
 .report-content h1:target,
 .report-content h2:target,
 .report-content h3:target,
 .figure-title:target,
 .table-title:target,
-.references p:target {
-background: transparent;
-box-shadow: none;
-}
+caption:target,
+.references p:target { background: transparent; box-shadow: none; }
 }
 </style>
 </head>
@@ -536,8 +436,8 @@ Theory for Continuous Responses into Dichotomous Distal Outcomes: A
 Bayesian Approach</h1>
 <div class="report-meta">
 <p class="author"><strong>Ingo Dube Souza</strong></p>
-<p>Graduate Program in Statistics and Data Science (PGECD/UFBA)</p>
-<p>Economic Studies (SENAI/CIMATEC)</p>
+<p>MSc Program in Statistics and Data Science (PGECD/UFBA)</p>
+<p>Department of Industrial Economics (SENAI/CIMATEC)</p>
 <p class="email"><a href="mailto:ingo.dube@ufba.br" class="email">ingo.dube@ufba.br</a></p>
 <p class="keywords"><strong>Keywords:</strong> IRT; Regression; Distal
 Outcome; MCMC; EM Algorithm.</p>
@@ -1664,6 +1564,7 @@ discrimination, difficulty or scale parameters.</p>
 Table 1: Comparison between two-step and set estimation methods for item
 parameters in CRM.
 </div>
+<div class="table-scroll">
 <table class="table table-condensed">
 <thead>
 <tr>
@@ -1912,6 +1813,7 @@ Joint
 </tr>
 </tbody>
 </table>
+</div>
 <div class="figure-source">
 Source: author’s own creation.
 </div>

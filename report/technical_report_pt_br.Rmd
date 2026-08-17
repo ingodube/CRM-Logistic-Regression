@@ -1,8 +1,8 @@
 ---
 title: "Incorporando o Erro de Mensuração da Teoria da Resposta ao Item para Respostas Contínuas em Desfechos Distais Dicotômicos: uma Abordagem Bayesiana"
 author: "Ingo Dube Souza"
-affiliation: "Programa de Pós Graduação em Estatística e Ciência de Dados (PGECD/UFBA)"
-secondary-affiliation: "Estudos Econômicos (SENAI/CIMATEC)"
+affiliation: "Programa de Mestrado em Estatística e Ciência de Dados (PGECD/UFBA)"
+secondary-affiliation: "Departamento de Economia Industrial (SENAI/CIMATEC)"
 email: "ingo.dube@ufba.br"
 keywords: "TRI; Regressão; Resposta Distal; MCMC; Algoritmo EM."
 lang: pt-BR
@@ -708,6 +708,7 @@ A análise dos resultados da [Tabela 1](#tab-parametros-itens) conclui que não 
 ```{r tabela-1, echo=FALSE, eval=TRUE, results='asis'}
 tabela = read.csv("../Spreadsheets (PT-BR)/tabela_parametros.csv",
                   check.names = FALSE)
+cat('<div class="table-scroll">')
 cat('<table class="table table-condensed">')
 cat('<thead>')
 cat('<tr><th rowspan="2">n</th><th rowspan="2">Método</th>',
@@ -721,7 +722,7 @@ for (i in seq_len(nrow(tabela))) {
   cat('<tr><td>', tabela$n[i], '</td><td>', tabela$metodo[i], '</td>',
       paste0('<td>', valores, '</td>', collapse = ''), '</tr>', sep = '')
 }
-cat('</tbody></table>')
+cat('</tbody></table></div>')
 ```
 
 <div class="figure-source">Fonte: elaboração própria do autor.</div>

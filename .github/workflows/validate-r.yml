@@ -13,8 +13,8 @@ jobs:
         with:
           r-version: "4.6.1"
           use-public-rspm: true
-      - name: Install JAGS
-        run: sudo apt-get update && sudo apt-get install -y jags libglpk-dev libxml2-dev
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y libglpk-dev libxml2-dev
       - uses: r-lib/actions/setup-renv@v2
-      - name: Validate syntax, paths, parity, and dependencies
+      - name: Validate syntax, structure, parity, and dependencies
         run: Rscript scripts/validate_reproducibility.R

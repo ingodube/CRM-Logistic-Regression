@@ -9,8 +9,6 @@ on:
       - "tools/**"
       - "Spreadsheets (EN)/**"
       - "Spreadsheets (PT-BR)/**"
-      - "Results (EN)/**"
-      - "Results (PT-BR)/**"
       - "renv.lock"
       - ".github/workflows/publish-technical-report.yml"
   workflow_dispatch:
@@ -38,12 +36,9 @@ jobs:
       - uses: r-lib/actions/setup-pandoc@v2
 
       - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y jags poppler-utils libglpk-dev libxml2-dev
+        run: sudo apt-get update && sudo apt-get install -y poppler-utils libglpk-dev libxml2-dev
 
       - uses: r-lib/actions/setup-renv@v2
-
-      - name: Localize analytical repository artifacts
-        run: python tools/localize_repository.py
 
       - name: Prepare lightweight bilingual data
         run: Rscript scripts/prepare_report_data.R
@@ -57,7 +52,7 @@ jobs:
       - name: Compare protected PT-BR text with the source PDF
         run: Rscript scripts/compare_report_text.R
 
-      - name: Validate analytical reproducibility
+      - name: Validate repository reproducibility
         run: Rscript scripts/validate_reproducibility.R
 
       - name: Verify renv status

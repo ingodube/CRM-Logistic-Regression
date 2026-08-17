@@ -1,8 +1,8 @@
 ---
 title: "Incorporating Measurement Error from Item Response Theory for Continuous Responses into Dichotomous Distal Outcomes: A Bayesian Approach"
 author: "Ingo Dube Souza"
-affiliation: "Graduate Program in Statistics and Data Science (PGECD/UFBA)"
-secondary-affiliation: "Economic Studies (SENAI/CIMATEC)"
+affiliation: "MSc Program in Statistics and Data Science (PGECD/UFBA)"
+secondary-affiliation: "Department of Industrial Economics (SENAI/CIMATEC)"
 email: "ingo.dube@ufba.br"
 keywords: "IRT; Regression; Distal Outcome; MCMC; EM Algorithm."
 lang: en
@@ -708,6 +708,7 @@ Analysis of the [Table 1](#tab-parametros-itens) results concludes that there we
 ```{r tabela-1, echo=FALSE, eval=TRUE, results='asis'}
 table_data = read.csv("../Spreadsheets (EN)/item_parameter_table.csv",
                   check.names = FALSE)
+cat('<div class="table-scroll">')
 cat('<table class="table table-condensed">')
 cat('<thead>')
 cat('<tr><th rowspan="2">n</th><th rowspan="2">Method</th>',
@@ -721,7 +722,7 @@ for (i in seq_len(nrow(table_data))) {
   cat('<tr><td>', table_data$n[i], '</td><td>', table_data$method[i], '</td>',
       paste0('<td>', values, '</td>', collapse = ''), '</tr>', sep = '')
 }
-cat('</tbody></table>')
+cat('</tbody></table></div>')
 ```
 
 <div class="figure-source">Source: author's own creation.</div>

@@ -26,15 +26,23 @@ if (!rmarkdown::pandoc_available()) {
 docs_dir <- file.path(project_dir, "docs")
 dir.create(docs_dir, recursive = TRUE, showWarnings = FALSE)
 
-reports <- c(
-  "technical_report_en.Rmd" = "metodologia.html",
-  "technical_report_pt_br.Rmd" = "methodology-pt-br.html"
+reports <- list(
+  list(
+    source = "technical_report_en.Rmd",
+    output = "metodologia.html",
+    canonical = "https://ingodube.github.io/CRM-Logistic-Regression/metodologia.html"
+  ),
+  list(
+    source = "technical_report_pt_br.Rmd",
+    output = "methodology-pt-br.html",
+    canonical = "https://ingodube.github.io/CRM-Logistic-Regression/methodology-pt-br.html"
+  )
 )
 
-for (source_name in names(reports)) {
+for (report in reports) {
   rmarkdown::render(
-    input = file.path(project_dir, "report", source_name),
-    output_file = unname(reports[[source_name]]),
+    input = file.path(project_dir, "report", report$source),
+    output_file = report$output,
     output_dir = docs_dir,
     envir = new.env(parent = globalenv()),
     clean = TRUE,
@@ -42,9 +50,18 @@ for (source_name in names(reports)) {
   )
 }
 
-for (output_name in unname(reports)) {
-  output_path <- file.path(docs_dir, output_name)
+for (report in reports) {
+  output_path <- file.path(docs_dir, report$output)
   html <- readLines(output_path, warn = FALSE, encoding = "UTF-8")
+  metadata <- c(
+    sprintf('<link rel="canonical" href="%s">', report$canonical),
+    '<link rel="alternate" hreflang="en" href="https://ingodube.github.io/CRM-Logistic-Regression/metodologia.html">',
+    '<link rel="alternate" hreflang="pt-BR" href="https://ingodube.github.io/CRM-Logistic-Regression/methodology-pt-br.html">',
+    '<link rel="alternate" hreflang="x-default" href="https://ingodube.github.io/CRM-Logistic-Regression/metodologia.html">'
+  )
+  viewport_line <- grep('<meta name="viewport"', html, fixed = TRUE)
+  if (length(viewport_line) != 1L) stop("Could not locate the viewport metadata in ", report$output)
+  html <- append(html, metadata, after = viewport_line)
   html <- sub("[[:blank:]]+$", "", html)
   writeLines(html, output_path, useBytes = TRUE)
 }

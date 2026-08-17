@@ -52,7 +52,8 @@ for (locale in names(reports)) {
     '<nav class="language-bar"', '<details class="language-switcher">',
     'hreflang="en"', 'hreflang="pt-BR"', 'hreflang="x-default"',
     '<link rel="canonical"', 'aria-current="page"',
-    'data:image/png;base64', "--accent: #e65b2c", "max-width: 46rem", "<math"
+    'data:image/png;base64', "--accent: #e65b2c", "max-width: 46rem",
+    "pre.sourceCode { overflow: auto; }", '<div class="table-scroll">', "<math"
   )
   absent <- structural[!vapply(structural, grepl, logical(1), x = html, fixed = TRUE)]
   if (length(absent)) stop(locale, " structural requirements are missing: ", paste(absent, collapse = "; "))
