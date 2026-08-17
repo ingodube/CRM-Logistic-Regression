@@ -674,7 +674,7 @@ beta_results$n = factor(beta_results$n,
                            levels = c(100, 250, 500, 1000))
 beta_results$method = factor(
   beta_results$method,
-  levels = c("Two-stage", "Joint")
+  levels = c("Two-step", "Joint")
 )
 
 ggplot(beta_results,
@@ -738,7 +738,7 @@ theta_results$n = factor(theta_results$n,
                             levels = c(100, 250, 500, 1000))
 theta_results$method = factor(
   theta_results$method,
-  levels = c("Two-stage", "Joint")
+  levels = c("Two-step", "Joint")
 )
 
 ggplot(theta_results,

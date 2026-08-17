@@ -1,12 +1,12 @@
 # CRM Logistic Regression
 
-Reproducible R study comparing two-stage and joint Bayesian estimation for logistic regression with latent traits measured by the Continuous Response Model (CRM).
+Reproducible R study comparing two-step and joint Bayesian estimation for logistic regression with latent traits measured by the Continuous Response Model (CRM).
 
 ## Technical report
 
 The methodological report documents the CRM specification, logistic regression for a dichotomous distal outcome, item-parameter interpretation, the simulation design, model diagnostics, and numerical comparisons.
 
-- [Read the technical report in English](https://ingodube.github.io/CRM-Logistic-Regression/metodologia.html).
+- [Technical Report - English](https://ingodube.github.io/CRM-Logistic-Regression/metodologia.html).
 
 ## Repository structure
 

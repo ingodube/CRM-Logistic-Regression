@@ -87,7 +87,7 @@ CODE_REPLACEMENTS = [
     ("theta_resultados", "theta_results"), ("tabela", "table_data"),
     ("valores", "values"), ("metodo", "method"),
     ("theta_verdadeiro", "true_theta"), ("theta_estimado_medio", "mean_theta_estimate"),
-    ('"Duas etapas"', '"Two-stage"'), ('"Conjunto"', '"Joint"'),
+    ('"Duas etapas"', '"Two-step"'), ('"Conjunto"', '"Joint"'),
     ('"Tamanho amostral (n)"', '"Sample size (n)"'), ('"Método"', '"Method"'),
     ("<th colspan=\"3\">Vicio</th>", "<th colspan=\"3\">Bias</th>"),
 ]

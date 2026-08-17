@@ -18,6 +18,46 @@ plain_text <- function(html) {
   text <- gsub("&amp;", "&", text)
   trimws(gsub("[[:space:]]+", " ", text))
 }
+assert_no_forbidden_english_terms <- function(project_dir) {
+  forbidden_pattern <- paste0("two-", "stage|two_", "stage")
+  text_paths <- c(
+    file.path(project_dir, "README.md"),
+    file.path(project_dir, "report", "technical_report_en.Rmd"),
+    file.path(project_dir, "tools", c("localize_csvs.mjs", "translate_report.py")),
+    list.files(
+      file.path(project_dir, "Spreadsheets (EN)"),
+      pattern = "\\.csv$", full.names = TRUE, ignore.case = TRUE
+    ),
+    file.path(project_dir, "docs", "metodologia.html")
+  )
+  text_hits <- vapply(text_paths, function(path) {
+    grepl(forbidden_pattern, read_text(path), ignore.case = TRUE, perl = TRUE)
+  }, logical(1))
+  if (any(text_hits)) {
+    stop(
+      "Forbidden English terminology found in: ",
+      paste(normalizePath(text_paths[text_hits], winslash = "/"), collapse = ", ")
+    )
+  }
+
+  workbooks <- list.files(
+    file.path(project_dir, "Spreadsheets (EN)"),
+    pattern = "\\.xlsx$", full.names = TRUE, ignore.case = TRUE
+  )
+  for (workbook in workbooks) {
+    extraction_dir <- tempfile("xlsx-terminology-")
+    dir.create(extraction_dir)
+    on.exit(unlink(extraction_dir, recursive = TRUE, force = TRUE), add = TRUE)
+    utils::unzip(workbook, exdir = extraction_dir)
+    xml_paths <- list.files(extraction_dir, pattern = "\\.xml$", recursive = TRUE, full.names = TRUE)
+    xml_hit <- vapply(xml_paths, function(path) {
+      grepl(forbidden_pattern, read_text(path), ignore.case = TRUE, perl = TRUE)
+    }, logical(1))
+    if (any(xml_hit)) {
+      stop("Forbidden English terminology found in workbook: ", basename(workbook))
+    }
+  }
+}
 
 reports <- list(
   EN = list(
@@ -100,5 +140,7 @@ if (!grepl('url=metodologia.html', index, fixed = TRUE) ||
     !grepl('window.location.replace("metodologia.html")', index, fixed = TRUE)) {
   stop("docs/index.html does not redirect to the English report.")
 }
+
+assert_no_forbidden_english_terms(project_dir)
 
 message("Bilingual report validation passed: content, parity, links, accessibility, and self-containment.")

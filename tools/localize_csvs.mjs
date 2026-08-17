@@ -31,7 +31,7 @@ const replacements = [
   ["beta_1_estimados_mean.txt", "beta_1_estimates_mean.txt"],
   ["a_estimados_mean.txt", "a_estimates_mean.txt"],
   ["b_estimados_mean.txt", "b_estimates_mean.txt"],
-  ["Duas etapas", "Two-stage"], ["Conjunto", "Joint"],
+  ["Duas etapas", "Two-step"], ["Conjunto", "Joint"],
   ["metodo", "method"], ["replicacao", "replication"],
   ["vicio", "bias"], ["media", "mean"], ["desvio_padrao", "standard_deviation"],
   ["minimo", "minimum"], ["maximo", "maximum"], ["amplitude", "range"],
@@ -61,6 +61,6 @@ for (const [sourceName, targetName] of files) {
   const sourceRows = source.trimEnd().split(/\r?\n/).length;
   const targetRows = target.trimEnd().split(/\r?\n/).length;
   if (sourceRows !== targetRows) throw new Error(`Row parity failed for ${sourceName}`);
-  await fs.writeFile(path.join(targetDir, targetName), target.replace(/\r\n/g, "\n"), "utf8");
+  await fs.writeFile(path.join(targetDir, targetName), target, "utf8");
 }
 console.log(JSON.stringify({ csv_files: files.size, numeric_parity: "PASS", row_parity: "PASS" }));

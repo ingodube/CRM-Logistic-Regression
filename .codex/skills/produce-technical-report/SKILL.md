@@ -43,4 +43,5 @@ git diff --check
 
 - The two report sources must share citations, references, semantic IDs, equations, chunk IDs, figures, tables, links, and numeric values.
 - Translate displayed code identifiers, messages, labels, and spreadsheet paths without changing package APIs, statistical expressions, or required input literals.
+- Translate the estimation method `Duas etapas` exclusively as `two-step` in English prose, as `Two-step` where capitalization is required, and as `two_step` in code identifiers.
 - Rebuild localized CSV and report artifacts deterministically and retain their parity checks.
